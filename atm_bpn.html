@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1F4E79">
+<title>ATMs BPN</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --azul:#1F4E79;--azul2:#2E75B6;--verde:#375623;
+    --bg:#f0f4f8;--card:#fff;--texto:#1a1a2e;--gris:#6b7280;
+    --shadow:0 2px 12px rgba(0,0,0,.12);
+  }
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+       background:var(--bg);color:var(--texto);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+
+  /* HEADER */
+  header{background:var(--azul);color:#fff;padding:10px 14px;
+         display:flex;align-items:center;gap:10px;
+         box-shadow:0 2px 8px rgba(0,0,0,.25);z-index:1000;flex-shrink:0}
+  header h1{font-size:17px;font-weight:700;letter-spacing:.3px}
+  header span{font-size:11px;opacity:.75;margin-left:auto}
+  .logo{width:32px;height:32px;background:#fff2;border-radius:8px;
+        display:flex;align-items:center;justify-content:center;font-size:18px}
+
+  /* PANEL DE BÚSQUEDA */
+  #panel{background:var(--card);padding:10px 12px;
+         box-shadow:var(--shadow);z-index:900;flex-shrink:0}
+  .search-row{display:flex;gap:8px;margin-bottom:8px}
+  #buscar{flex:1;padding:9px 12px;border:1.5px solid #d1d5db;border-radius:10px;
+          font-size:15px;outline:none;transition:.2s}
+  #buscar:focus{border-color:var(--azul2)}
+  .btn-limpiar{background:var(--azul);color:#fff;border:none;padding:9px 14px;
+               border-radius:10px;font-size:13px;cursor:pointer;white-space:nowrap}
+  .filtros{display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px}
+  .filtros::-webkit-scrollbar{display:none}
+  select{padding:7px 10px;border:1.5px solid #d1d5db;border-radius:8px;
+         font-size:13px;background:#fff;cursor:pointer;outline:none;min-width:0}
+  select:focus{border-color:var(--azul2)}
+  .chip-count{background:var(--azul2);color:#fff;border-radius:20px;
+              padding:4px 10px;font-size:12px;font-weight:600;white-space:nowrap;
+              display:flex;align-items:center}
+
+  /* MAPA */
+  #mapa{flex:1;z-index:1}
+
+  /* PANEL INFERIOR (resultado seleccionado) */
+  #info-panel{position:fixed;bottom:0;left:0;right:0;
+              background:#fff;border-radius:18px 18px 0 0;
+              box-shadow:0 -4px 20px rgba(0,0,0,.18);
+              padding:16px;z-index:2000;
+              transform:translateY(100%);transition:transform .3s ease;
+              max-height:70vh;overflow-y:auto}
+  #info-panel.visible{transform:translateY(0)}
+  .drag-bar{width:40px;height:4px;background:#d1d5db;border-radius:2px;
+            margin:0 auto 14px;cursor:pointer}
+  .info-header{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px}
+  .info-icon{width:44px;height:44px;border-radius:12px;background:var(--azul);
+             color:#fff;display:flex;align-items:center;justify-content:center;
+             font-size:22px;flex-shrink:0}
+  .info-title h2{font-size:15px;font-weight:700;line-height:1.3}
+  .info-title p{font-size:12px;color:var(--gris);margin-top:2px}
+  .info-body{display:grid;gap:8px}
+  .info-row{display:flex;gap:8px;align-items:flex-start}
+  .info-label{font-size:11px;color:var(--gris);text-transform:uppercase;
+              letter-spacing:.5px;min-width:72px;padding-top:1px}
+  .info-val{font-size:14px;font-weight:500;flex:1}
+  .badge{display:inline-block;padding:3px 10px;border-radius:20px;
+         font-size:11px;font-weight:600;text-transform:uppercase}
+  .badge-dn{background:#D6EAF8;color:#1F4E79}
+  .badge-ncr{background:#C6EFCE;color:#375623}
+  .badge-wincor{background:#FCE4D6;color:#843C0C}
+  .badge-diebold{background:#FFCCCC;color:#C9513E}
+  .badge-otro{background:#f0f0f0;color:#555}
+  .btn-ver-mapa{width:100%;margin-top:14px;padding:12px;
+                background:var(--azul);color:#fff;border:none;
+                border-radius:12px;font-size:14px;font-weight:600;cursor:pointer}
+  .btn-cerrar{position:absolute;top:14px;right:14px;background:none;
+              border:none;font-size:22px;cursor:pointer;color:var(--gris)}
+
+  /* LISTA LATERAL (en tablet/desktop) */
+  @media(min-width:768px){
+    body{flex-direction:row}
+    #panel{width:320px;height:100%;overflow-y:auto;
+           display:flex;flex-direction:column;gap:0;padding:0}
+    .search-wrap{padding:14px}
+    .search-row{flex-direction:column}
+    #lista{flex:1;overflow-y:auto}
+    .lista-item{padding:12px 14px;border-bottom:1px solid #eee;cursor:pointer;
+                transition:.15s}
+    .lista-item:hover{background:#f0f4f8}
+    .lista-item.activo{background:#e8f0fe;border-left:3px solid var(--azul2)}
+    .lista-item h3{font-size:14px;font-weight:600}
+    .lista-item p{font-size:12px;color:var(--gris);margin-top:2px}
+    #mapa{flex:1}
+    #info-panel{position:relative;transform:none!important;
+                box-shadow:none;border-radius:0;padding:14px;
+                border-top:1px solid #eee}
+  }
+
+  /* Marcador personalizado */
+  .marker-label{
+    background:var(--azul);color:#fff;border-radius:8px;
+    padding:3px 7px;font-size:11px;font-weight:700;
+    white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.3);
+    border:2px solid #fff;
+  }
+  .marker-label.marca-ncr{background:#375623}
+  .marker-label.marca-wincor{background:#843C0C}
+  .marker-label.marca-diebold{background:#C9513E}
+  .marker-label.marca-dn{background:#1F4E79}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🏧</div>
+  <h1>ATMs BPN</h1>
+  <span id="header-count">220 cajeros</span>
+</header>
+
+<div id="panel">
+  <div class="search-wrap" style="padding:10px 12px">
+    <div class="search-row">
+      <input id="buscar" type="search" placeholder="🔍  Buscar por cajero, ciudad o dirección..." autocomplete="off">
+      <button class="btn-limpiar" onclick="limpiar()">✕</button>
+    </div>
+    <div class="filtros">
+      <select id="fil-ciudad" onchange="aplicarFiltros()">
+        <option value="">📍 Todas las ciudades</option>
+      </select>
+      <select id="fil-marca" onchange="aplicarFiltros()">
+        <option value="">🏷 Todas las marcas</option>
+      </select>
+      <div class="chip-count" id="chip-count">220</div>
+    </div>
+  </div>
+  <div id="lista"></div>
+</div>
+
+<div id="mapa"></div>
+
+<div id="info-panel">
+  <button class="btn-cerrar" onclick="cerrarPanel()">×</button>
+  <div class="drag-bar" onclick="cerrarPanel()"></div>
+  <div id="info-contenido"></div>
+</div>
+
+<script>
+// ── DATOS ─────────────────────────────────────────────────────────────────────
+const DATA = {"atms": [{"id": 2500, "nombre": "Suc. Añelo", "ciudad": "Añelo", "direccion": "Calle 3  s/n, entre Av. Jorge Tanuz y calle 15, Añelo.", "marca": "DN", "modelo": "DN", "tipo": "5310405786", "ip": "", "lat": -38.35299, "lon": -68.787925}, {"id": 2503, "nombre": "Ext. Vista Alegre", "ciudad": "Vista Alegre", "direccion": "Ruta Provincial n° 7, Dique Ballester, Vista Alegre.", "marca": "NCR", "modelo": "NCR", "tipo": "28-44902864", "ip": "", "lat": -38.727582, "lon": -68.176807}, {"id": 2505, "nombre": "Ext. Buta Ranquil -Chos Malal", "ciudad": "Buta Ranquil", "direccion": "San Martin y Belgrano, Buta Ranquil.", "marca": "NCR", "modelo": "DIEBOLD", "tipo": "1720-VGR-01103", "ip": "", "lat": -37.051402, "lon": -69.878558}, {"id": 2506, "nombre": "Aeropuerto  -  Matríz", "ciudad": "Aeropuerto Neuquen", "direccion": "Aeropuerto Internacional Juan Domingo Peron, Neuquen.", "marca": "DIEBOLD", "modelo": "DIEBOLD", "tipo": "1720-VGR-01107", "ip": "", "lat": -38.952244, "lon": -68.140862}, {"id": 2507, "nombre": "Suc. San Patricio del Chañar", "ciudad": "San Patricio del Chañar", "direccion": "Av. Pilmayquen 150, San Patricio del Chañar.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "5310324940", "ip": "", "lat": -38.626311, "lon": -68.299694}, {"id": 2509, "nombre": "Las Coloradas   - Zapala", "ciudad": "Las Coloradas", "direccion": "San Martin y Zingoni, Las Coloradas.", "marca": "DN", "modelo": "NCR", "tipo": "28-44902859", "ip": "", "lat": -39.557, "lon": -70.59422}, {"id": 2510, "nombre": "Suc. Andacollo  -", "ciudad": "Andacollo", "direccion": "Huaraco y Cordillera del Viento, Andacollo.", "marca": "DN", "modelo": "DN", "tipo": "5310405739", "ip": "", "lat": -37.181356, "lon": -70.667315}, {"id": 2513, "nombre": "Consejo Prov. Educ.  - Neuquén", "ciudad": "Consejo Provincial de Educacion", "direccion": "Belgrano y Colon, Neuquen.", "marca": "DN", "modelo": "DN", "tipo": "J811002326", "ip": "", "lat": -38.950617, "lon": -68.078395}, {"id": 2514, "nombre": "Suc. Buenos Aires", "ciudad": "Buenos Aires", "direccion": "Av. Maipu 50, Capital Federal.", "marca": "DIEBOLD", "modelo": "DIEBOLD", "tipo": "1720-R33-01310", "ip": "", "lat": -34.607474, "lon": -58.376521}, {"id": 2515, "nombre": "Hosp. C. Rendón  - Neuquén", "ciudad": "Hospital Castro Rendon", "direccion": "Buenos Aires y Alderete, Neuquen.", "marca": "NCR", "modelo": "NCR", "tipo": "28-57651890", "ip": "", "lat": -38.95071, "lon": -68.057425}, {"id": 2516, "nombre": "Suc.  Rivadavia", "ciudad": "Rivadavia", "direccion": "Rivadavia y Santa Fe, Neuquen.", "marca": "NCR", "modelo": "NCR", "tipo": "28-44269897", "ip": "", "lat": -38.954117, "lon": -68.056283}, {"id": 2518, "nombre": "Suc. Félix San Martín", "ciudad": "Felix San Martin", "direccion": "Felix San Martin 150, Neuquen.", "marca": "NCR", "modelo": "NCR", "tipo": "83-45452961", "ip": "", "lat": -38.959243, "lon": -68.057049}, {"id": 2520, "nombre": "Suc. Junín de los Andes", "ciudad": "Junin de los Andes", "direccion": "San Martin y Lamadrid, Junin de los Andes.", "marca": "NCR", "modelo": "NCR", "tipo": "28-44902888", "ip": "", "lat": -39.950287, "lon": -71.071647}, {"id": 2522, "nombre": "I.S.S.N     - Neuquén", "ciudad": "Instituto de Seguridad Social Neuquen", "direccion": "Buenos Aires 353, Neuquen.", "marca": "NCR", "modelo": "NCR", "tipo": "28-57651891", "ip": "", "lat": -38.951394, "lon": -68.057521}, {"id": 2523, "nombre": "Suc. Zapala", "ciudad": "Zapala", "direccion": "Chaneton 410, Zapala.", "marca": "DN", "modelo": "WINCOR", "tipo": "5310190140", "ip": "", "lat": -38.904018, "lon": -70.065475}, {"id": 2524, "nombre": "Suc. Cutral Có", "ciudad": "Cutral Co", "direccion": "Sarmiento 109, Cutral Co.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "5310325240", "ip": "", "lat": -38.936363, "lon": -69.229144}, {"id": 2525, "nombre": "Suc. San Martín de los Andes", "ciudad": "San Martin de los Andes", "direccion": "Belgrano 990, San Martin de los Andes.", "marca": "NCR", "modelo": "NCR", "tipo": "28-44902635", "ip": "", "lat": -40.158365, "lon": -71.348576}, {"id": 2526, "nombre": "Suc. Centenario", "ciudad": "Centenario", "direccion": "San Martin 398, Centenario.", "marca": "NCR", "modelo": "NCR", "tipo": "28-44902868", "ip": "", "lat": -38.829314, "lon": -68.120918}, {"id": 2527, "nombre": "Suc. Rincón de los Sauces", "ciudad": "Rincon de los Sauces", "direccion": "Av. 20 de Diciembre 50, Rincon de los Sauces.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "5310325087", "ip": "", "lat": -37.388644, "lon": -68.920293}, {"id": 2528, "nombre": "Suc. Plottier", "ciudad": "Plottier", "direccion": "Chos Malal 176, Plottier.", "marca": "NCR", "modelo": "NCR", "tipo": "83-45452962", "ip": "", "lat": -38.952069, "lon": -68.22794}, {"id": 2529, "nombre": "Suc. Plaza Huíncul", "ciudad": "Plaza Huincul", "direccion": "Av. San Martin 895, Plaza Huincul.", "marca": "NCR", "modelo": "NCR", "tipo": "28-44269898", "ip": "", "lat": -38.930419, "lon": -69.20607}, {"id": 2530, "nombre": "Suc. Chos Malal", "ciudad": "Chos Malal", "direccion": "25 de Mayo 540, Chos Malal.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG805985", "ip": "", "lat": -37.378875, "lon": -70.272721}, {"id": 2531, "nombre": "Suc. Villa la Angostura", "ciudad": "Villa La Angostura", "direccion": "Av. Nahuel Huapi 70, Villa La Angostura.", "marca": "DN", "modelo": "DIEBOLD", "tipo": "1720-R33-01311", "ip": "", "lat": -40.762978, "lon": -71.648082}, {"id": 2533, "nombre": "Suc. Piedra del Aguila", "ciudad": "Piedra del Aguila", "direccion": "Conrado Villegas 52, Piedra del Aguila.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "5310140393", "ip": "", "lat": -40.049901, "lon": -70.07773}, {"id": 2534, "nombre": "Suc. Chos Malal", "ciudad": "Chos Malal", "direccion": "25 de Mayo 540, Chos Malal.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "5310000228", "ip": "", "lat": -37.378875, "lon": -70.272721}, {"id": 2535, "nombre": "Suc. Félix San Martín", "ciudad": "Felix San Martin", "direccion": "Felix San Martin 150, Neuquen.", "marca": "WINCOR", "modelo": "NCR", "tipo": "28-44902870", "ip": "", "lat": -38.959243, "lon": -68.057049}, {"id": 2536, "nombre": "Suc.  Rivadavia", "ciudad": "Rivadavia", "direccion": "Rivadavia y Santa Fe, Neuquen.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "5310140516", "ip": "", "lat": -38.954117, "lon": -68.056283}, {"id": 2537, "nombre": "Deleg. Godoy", "ciudad": "Godoy", "direccion": "Godoy y Chajari, Neuquen.", "marca": "Sucursal", "modelo": "DN", "tipo": "5310405650", "ip": "", "lat": -38.948605, "lon": -68.117476}, {"id": 2538, "nombre": "Municipalidad  Nqn  - Neuquén", "ciudad": "Municipalidad de Neuquen", "direccion": "Roca y Av. Argentina, Neuquen.", "marca": "NCR", "modelo": "NCR", "tipo": "28-57651892", "ip": "", "lat": -38.951773, "lon": -68.059562}, {"id": 2539, "nombre": "Ext. Las Ovejas", "ciudad": "Las Ovejas", "direccion": "Av. Pedernera s/n, Las Ovejas.", "marca": "DN", "modelo": "DIEBOLD", "tipo": "1720-VGR-01109", "ip": "", "lat": -36.986136, "lon": -70.752795}, {"id": 2540, "nombre": "Suc. Zapala", "ciudad": "Zapala", "direccion": "Chaneton 410, Zapala.", "marca": "NCR", "modelo": "NCR", "tipo": "28-44902872", "ip": "", "lat": -38.904018, "lon": -70.065475}, {"id": 2541, "nombre": "Suc. Cutral Có", "ciudad": "Cutral Co", "direccion": "Sarmiento 109, Cutral Co.", "marca": "DN", "modelo": "WINCOR", "tipo": "5310140314", "ip": "", "lat": -38.936363, "lon": -69.229144}, {"id": 2542, "nombre": "Suc. San Martín de los Andes", "ciudad": "San Martin de los Andes", "direccion": "Belgrano 990, San Martin de los Andes.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "5310140279", "ip": "", "lat": -40.158365, "lon": -71.348576}, {"id": 2543, "nombre": "Suc. Centenario", "ciudad": "Centenario", "direccion": "San Martin 398, Centenario.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "5310140299", "ip": "", "lat": -38.829314, "lon": -68.120918}, {"id": 2544, "nombre": "Suc. Plottier", "ciudad": "Plottier", "direccion": "Chos Malal 176, Plottier.", "marca": "DN", "modelo": "NCR", "tipo": "28-44269895", "ip": "", "lat": -38.952069, "lon": -68.22794}, {"id": 2545, "nombre": "Casa Matriz", "ciudad": "Casa Matriz", "direccion": "Av. Argentina 41, Neuquen.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "5310325264", "ip": "", "lat": -38.954775, "lon": -68.058835}, {"id": 2547, "nombre": "Casa Matriz", "ciudad": "Casa Matriz", "direccion": "Av. Argentina 41, Neuquen.", "marca": "DN", "modelo": "NCR", "tipo": "28-44902890", "ip": "", "lat": -38.954775, "lon": -68.058835}, {"id": 2548, "nombre": "Casa Matriz", "ciudad": "Casa Matriz", "direccion": "Av. Argentina 41, Neuquen.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "5310140332", "ip": "", "lat": -38.954775, "lon": -68.058835}, {"id": 2549, "nombre": "99  Casa Matriz", "ciudad": "Casa Matriz", "direccion": "Av. Argentina 41, Neuquen.", "marca": "DN", "modelo": "NCR", "tipo": "28-44902891", "ip": "", "lat": -38.954775, "lon": -68.058835}, {"id": 5300, "nombre": "Suc. Rincón de los Sauces", "ciudad": "Rincon de los Sauces", "direccion": "Av. 20 de Diciembre 50, Rincon de los Sauces.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "5310140500", "ip": "", "lat": -37.388644, "lon": -68.920293}, {"id": 5301, "nombre": "Suc. Las Lajas", "ciudad": "Las Lajas", "direccion": "Alsina 468, Las Lajas.", "marca": "DN", "modelo": "DN", "tipo": "5310405779", "ip": "", "lat": -38.525177, "lon": -70.360921}, {"id": 5302, "nombre": "Hospital Heller     - Neuquén", "ciudad": "Hospital Heller", "direccion": "Godoy y Lihuen, Neuquen.", "marca": "NCR", "modelo": "NCR", "tipo": "28-57651883", "ip": "", "lat": -38.937729, "lon": -68.117028}, {"id": 5304, "nombre": "Mariano Moreno   - Zapala", "ciudad": "Mariano Moreno", "direccion": "San Martin y Belgrano, Mariano Moreno.", "marca": "DN", "modelo": "NCR", "tipo": "28-44902860", "ip": "", "lat": -38.759722, "lon": -70.034323}, {"id": 5307, "nombre": "Deleg. Vega Maipu", "ciudad": "Vega Maipu", "direccion": "Luis Goñi 17, San Martin de los Andes.", "marca": "Sucursal", "modelo": "WINCOR", "tipo": "5310325056", "ip": "", "lat": -40.127739, "lon": -71.248524}, {"id": 5308, "nombre": "Suc. Senillosa", "ciudad": "Senillosa", "direccion": "Misiones 240, Senillosa.", "marca": "DN", "modelo": "DIEBOLD", "tipo": "1720-R33-01372", "ip": "", "lat": -39.013997, "lon": -68.427282}, {"id": 5309, "nombre": "Suc.  Villa El Chocón", "ciudad": "Villa el Chocon", "direccion": "Local 8, Centro Comercial, Villa El Chocon.", "marca": "DN", "modelo": "DIEBOLD", "tipo": "1720-R33-01233", "ip": "", "lat": -39.26096, "lon": -68.784381}, {"id": 5310, "nombre": "Suc.  Picún Leufú", "ciudad": "Picun Leufu", "direccion": "Primeros Pobladores s/n, Picun Leufu.", "marca": "DN", "modelo": "DN", "tipo": "5310405479", "ip": "", "lat": -39.518301, "lon": -69.290885}, {"id": 5311, "nombre": "Ext. El Huecú  - Loncopué", "ciudad": "El Huecu", "direccion": "Belgrano y Rivera de arroyo Huecu, El Huecu.", "marca": "NCR", "modelo": "DIEBOLD", "tipo": "1617324", "ip": "", "lat": -37.644983, "lon": -70.582972}, {"id": 5312, "nombre": "Suc. Cutral Có", "ciudad": "Cutral Co", "direccion": "Sarmiento 109, Cutral Co.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG805966", "ip": "", "lat": -38.936363, "lon": -69.229144}, {"id": 5313, "nombre": "Deleg. Godoy", "ciudad": "Godoy", "direccion": "Godoy y Chajari, Neuquen.", "marca": "Sucursal", "modelo": "DN", "tipo": "5310405496", "ip": "", "lat": -38.948605, "lon": -68.117476}, {"id": 5314, "nombre": "Suc. Alcorta", "ciudad": "Alcorta", "direccion": "San Luis y Alcorta, Neuquen.", "marca": "WINCOR", "modelo": "DIEBOLD", "tipo": "1720-VGR-01112", "ip": "", "lat": -38.958286, "lon": -68.060851}, {"id": 5315, "nombre": "Suc. B° Sarmiento Centenario", "ciudad": "Sarmiento", "direccion": "Nicaragua 460, Centenario.", "marca": "DN", "modelo": "WINCOR", "tipo": "56HG805954", "ip": "", "lat": -38.825623, "lon": -68.139861}, {"id": 5317, "nombre": "Suc. Rincón de los Sauces", "ciudad": "Rincon de los Sauces", "direccion": "Av. 20 de Diciembre 50, Rincon de los Sauces.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "5310325143", "ip": "", "lat": -37.388644, "lon": -68.920293}, {"id": 5318, "nombre": "Suc. Junín de los Andes", "ciudad": "Junin de los Andes", "direccion": "San Martin y Lamadrid, Junin de los Andes.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG805962", "ip": "", "lat": -39.950287, "lon": -71.071647}, {"id": 5319, "nombre": "Villa Trafúl   - S. M. Andes", "ciudad": "Villa Traful", "direccion": "Laffite s/n, Villa Traful.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "5310140530", "ip": "", "lat": -40.655142, "lon": -71.400685}, {"id": 5320, "nombre": "Ext. ETON    -    Rivadavia", "ciudad": "E.T.O.N.", "direccion": "Teodoro Planas y Solalique, Neuquen.", "marca": "NCR", "modelo": "NCR", "tipo": "28-44269896", "ip": "", "lat": -38.958797, "lon": -68.106162}, {"id": 5321, "nombre": "Ext. Capriolo  - F. San Martín", "ciudad": "Capriolo", "direccion": "Chaneton 1365, Neuquen.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "5310140490", "ip": "", "lat": -38.969579, "lon": -68.070688}, {"id": 5322, "nombre": "Unidad Comercial Movil", "ciudad": "Unidad Comercial Movil", "direccion": "", "marca": "Móvil", "modelo": "NCR", "tipo": "28-57651884", "ip": "", "lat": -38.954775, "lon": -68.058835}, {"id": 5323, "nombre": "D. Municipal Turismo - S. M. Andes", "ciudad": "Secretaria de Turismo de San Martin de los Andes", "direccion": "San Martin y Juan Manuel de Rosas, San Martin de los Andes.", "marca": "NCR", "modelo": "NCR", "tipo": "28-44902636", "ip": "", "lat": -40.654339, "lon": -71.398673}, {"id": 5324, "nombre": "Suc. Plaza Huíncul", "ciudad": "Plaza Huincul", "direccion": "Av. San Martin 895, Plaza Huincul.", "marca": "NCR", "modelo": "NCR", "tipo": "28-44902634", "ip": "", "lat": -38.930419, "lon": -69.20607}, {"id": 5325, "nombre": "Deleg. Godoy", "ciudad": "Godoy", "direccion": "Godoy y Chajari, Neuquen.", "marca": "Sucursal", "modelo": "NCR", "tipo": "28-44902883", "ip": "", "lat": -38.948605, "lon": -68.117476}, {"id": 5326, "nombre": "Suc. San Patricio del Chañar", "ciudad": "San Patricio del Chañar", "direccion": "Av. Pilmayquen 150, San Patricio del Chañar.", "marca": "NCR", "modelo": "NCR", "tipo": "28-44902867", "ip": "", "lat": -38.626311, "lon": -68.299694}, {"id": 5327, "nombre": "LUNCEC     -    Neuquén", "ciudad": "LUNCEC", "direccion": "Islas Malvinas 1329, Neuquen.", "marca": "NCR", "modelo": "NCR", "tipo": "28-57651888", "ip": "", "lat": -38.947727, "lon": -68.040765}, {"id": 5329, "nombre": "Suc. Villa la Angostura", "ciudad": "Villa La Angostura", "direccion": "Av. Nahuel Huapi 70, Villa La Angostura.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "5310325295", "ip": "", "lat": -40.762978, "lon": -71.648082}, {"id": 5330, "nombre": "Suc. Zapala", "ciudad": "Zapala", "direccion": "Chaneton 410, Zapala.", "marca": "NCR", "modelo": "NCR", "tipo": "28-44902871", "ip": "", "lat": -38.904018, "lon": -70.065475}, {"id": 5331, "nombre": "Suc. Plottier", "ciudad": "Plottier", "direccion": "Chos Malal 176, Plottier.", "marca": "DN", "modelo": "NCR", "tipo": "28-44269894", "ip": "", "lat": -38.952069, "lon": -68.22794}, {"id": 5332, "nombre": "Suc. Rincón de los Sauces", "ciudad": "Rincon de los Sauces", "direccion": "Av. 20 de Diciembre 50, Rincon de los Sauces.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "5310000191", "ip": "", "lat": -37.388644, "lon": -68.920293}, {"id": 5333, "nombre": "Consejo Prov. Educ.  - Neuquén", "ciudad": "Consejo Provincial de Educacion", "direccion": "Belgrano y Colon, Neuquen.", "marca": "DN", "modelo": "DN", "tipo": "J811002312", "ip": "", "lat": -38.950617, "lon": -68.078395}, {"id": 5334, "nombre": "Barrio Progreso   - Neuquén", "ciudad": "B° Progreso", "direccion": "AntArtida Argentina 2335,  Neuquen.", "marca": "NCR", "modelo": "NCR", "tipo": "28-57651889", "ip": "", "lat": -38.947183, "lon": -68.09221}, {"id": 5335, "nombre": "Suc. B° Sarmiento Centenario", "ciudad": "Sarmiento", "direccion": "Nicaragua 460, Centenario.", "marca": "DN", "modelo": "NCR", "tipo": "28-44902866", "ip": "", "lat": -38.825623, "lon": -68.139861}, {"id": 5337, "nombre": "Suc. Félix San Martín", "ciudad": "Felix San Martin", "direccion": "Felix San Martin 150, Neuquen.", "marca": "NCR", "modelo": "NCR", "tipo": "28-44269892", "ip": "", "lat": -38.959243, "lon": -68.057049}, {"id": 5338, "nombre": "Jefatura Policía    - Neuquen", "ciudad": "Jefatura de Policia", "direccion": "Richieri 775, Neuquen.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG805967", "ip": "", "lat": -38.962685, "lon": -68.048308}, {"id": 5339, "nombre": "Suc. Senillosa", "ciudad": "Senillosa", "direccion": "Misiones 240, Senillosa.", "marca": "NCR", "modelo": "NCR", "tipo": "28-44902869", "ip": "", "lat": -39.013997, "lon": -68.427282}, {"id": 6350, "nombre": "Suc. Barrios Zapala", "ciudad": "Barrios Zapala", "direccion": "Av. 12 de Julio y Lamadrid, Zapala.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "5310140430", "ip": "", "lat": -38.89645, "lon": -70.076298}, {"id": 6351, "nombre": "Suc. Zabaleta Plottier", "ciudad": "Zabaleta Plottier", "direccion": "Zabaleta 203, Plottier.", "marca": "DN", "modelo": "DIEBOLD", "tipo": "1720-R33-01365", "ip": "", "lat": -38.957421, "lon": -68.238}, {"id": 6353, "nombre": "Suc. Alcorta", "ciudad": "Alcorta", "direccion": "San Luis y Alcorta, Neuquen.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "5310000247", "ip": "", "lat": -38.958286, "lon": -68.060851}, {"id": 6354, "nombre": "Suc. Plaza Huíncul", "ciudad": "Plaza Huincul", "direccion": "Av. San Martin 895, Plaza Huincul.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "5310140447", "ip": "", "lat": -38.930419, "lon": -69.20607}, {"id": 6355, "nombre": "Ext. Huinganco  -", "ciudad": "Huinganco", "direccion": "Manuel Belgrano s/n, Huinganco.", "marca": "DIEBOLD", "modelo": "DIEBOLD", "tipo": "1720-R33-01324", "ip": "", "lat": -37.158, "lon": -70.620728}, {"id": 6356, "nombre": "Suc. Junín de los Andes", "ciudad": "Junin de los Andes", "direccion": "San Martin y Lamadrid, Junin de los Andes.", "marca": "NCR", "modelo": "NCR", "tipo": "28-44902889", "ip": "", "lat": -39.950252, "lon": -71.07145}, {"id": 6357, "nombre": "Tricao Malal    - Chos Malal", "ciudad": "Tricao Malal", "direccion": "Tromen s/n, Tricao Malal.", "marca": "DN", "modelo": "NCR", "tipo": "28-44902856", "ip": "", "lat": -37.440612, "lon": -70.645143}, {"id": 6358, "nombre": "Deleg. Godoy", "ciudad": "Godoy", "direccion": "Godoy y Chajari, Neuquen.", "marca": "Sucursal", "modelo": "NCR", "tipo": "28-44902884", "ip": "", "lat": -38.948605, "lon": -68.117476}, {"id": 6359, "nombre": "Suc. Gral. Roca", "ciudad": "General Roca", "direccion": "TucumAn 542, Gral Roca, Rio Negro.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "5310324991", "ip": "", "lat": -39.028947, "lon": -67.572297}, {"id": 6360, "nombre": "Suc. Gral. Roca", "ciudad": "General Roca", "direccion": "TucumAn 542, Gral Roca, Rio Negro.", "marca": "NCR", "modelo": "NCR", "tipo": "28-44269899", "ip": "", "lat": -39.028947, "lon": -67.572297}, {"id": 6361, "nombre": "Suc. Centenario", "ciudad": "Centenario", "direccion": "San Martin 398, Centenario.", "marca": "DN", "modelo": "DN", "tipo": "5310405659", "ip": "", "lat": -38.829314, "lon": -68.120918}, {"id": 6363, "nombre": "Suc. Las Lajas", "ciudad": "Las Lajas", "direccion": "Alsina 468, Las Lajas.", "marca": "NCR", "modelo": "NCR", "tipo": "28-44269900", "ip": "", "lat": -38.525177, "lon": -70.360921}, {"id": 6364, "nombre": "Los Miches   -", "ciudad": "Los Miches", "direccion": "Lote 1 Manzana 8 s/n, Los Miches.", "marca": "NCR", "modelo": "NCR", "tipo": "28-44902855", "ip": "", "lat": -37.043612, "lon": -70.323212}, {"id": 6365, "nombre": "Taquimilán    -  Chos Malal", "ciudad": "TaquimilAn", "direccion": "Malvinas Argentinas s/n, TaquimilAn.", "marca": "NCR", "modelo": "NCR", "tipo": "28-44902857", "ip": "", "lat": -37.517047, "lon": -70.248427}, {"id": 6366, "nombre": "Barrancas    -  Chos Malal", "ciudad": "Barrancas", "direccion": "CapitAn de los Andes y Sargento Cabral, Barrancas.", "marca": "NCR", "modelo": "NCR", "tipo": "28-44902637", "ip": "", "lat": -36.82168, "lon": -69.916007}, {"id": 6369, "nombre": "Suc. Chos Malal", "ciudad": "Chos Malal", "direccion": "25 de Mayo 540, Chos Malal.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "5310325035", "ip": "", "lat": -37.378875, "lon": -70.272721}, {"id": 6370, "nombre": "Suc. Añelo", "ciudad": "Añelo", "direccion": "Calle 3 s/n, entre Av. Jorge Tanuz y calle 15, Añelo.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "5310324970", "ip": "", "lat": -38.35299, "lon": -68.787925}, {"id": 6371, "nombre": "Ext. Villa Pehuenia   -  Alumniné", "ciudad": "Villa Pehuenia", "direccion": "Ruta Provincial n° 13, Km 118, Villa Pehuenia.", "marca": "DN", "modelo": "DN", "tipo": "5310405772", "ip": "", "lat": -38.879728, "lon": -71.18652}, {"id": 6372, "nombre": "Campo Grande", "ciudad": "Campo Grande", "direccion": "Luis Pasteur 480, Villa Manzano, Rio Negro.", "marca": "Neutro", "modelo": "NCR", "tipo": "28-44902865", "ip": "", "lat": -38.679991, "lon": -68.217083}, {"id": 6373, "nombre": "Ext. Caviahue      -  Loncopué", "ciudad": "Caviahue", "direccion": "Ñorquin s/n entre, entre Bialous y Los Andes, Caviahue.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "5310140459", "ip": "", "lat": -37.871832, "lon": -71.054034}, {"id": 6374, "nombre": "Varvarco      -", "ciudad": "Varvarco", "direccion": "Av. Domuyo s/n, Varvarco.", "marca": "DN", "modelo": "DIEBOLD", "tipo": "1720-R33-01256", "ip": "", "lat": -37.357748, "lon": -70.269475}, {"id": 6375, "nombre": "Manzano Amargo  -", "ciudad": "Manzano Amargo", "direccion": "Mariano Moreno s/n, Manzano Amargo.", "marca": "NCR", "modelo": "DIEBOLD", "tipo": "1720-R33-01303", "ip": "", "lat": -36.753833, "lon": -70.763711}, {"id": 6376, "nombre": "Suc. Las Grutas", "ciudad": "Las Grutas", "direccion": "Rio Negro 320, Las Grutas.", "marca": "DIEBOLD", "modelo": "DIEBOLD", "tipo": "1720-VGR-01108", "ip": "", "lat": -40.80604, "lon": -65.085665}, {"id": 6379, "nombre": "Suc. Parque Industrial Neuquén", "ciudad": "Parque Industrial Neuquen", "direccion": "Gob. Emilio Belenguer, Lote 5, Neuquen.", "marca": "DN", "modelo": "NCR", "tipo": "28-44902632", "ip": "", "lat": -38.910206, "lon": -68.079953}, {"id": 6380, "nombre": "Suc. Villa Regina", "ciudad": "Villa Regina", "direccion": "Mitre 180, Villa Regina, Rio Negro.", "marca": "NCR", "modelo": "NCR", "tipo": "28-44269890", "ip": "", "lat": -39.098164, "lon": -67.086823}, {"id": 6381, "nombre": "Suc. Choele Choele", "ciudad": "Choele Choel", "direccion": "Avellaneda 770, Choele Choel, Rio Negro.", "marca": "NCR", "modelo": "NCR", "tipo": "28-44269891", "ip": "", "lat": -39.291353, "lon": -65.661701}, {"id": 6382, "nombre": "Suc. Isidro Gavilán", "ciudad": "Isidro GavilAn", "direccion": "Teodoro Planas y El Cholar, Neuquen.", "marca": "NCR", "modelo": "NCR", "tipo": "28-44902874", "ip": "", "lat": -38.958313, "lon": -68.118107}, {"id": 6383, "nombre": "Suc. Isidro Gavilán", "ciudad": "Isidro GavilAn", "direccion": "Teodoro Planas y El Cholar, Neuquen.", "marca": "NCR", "modelo": "NCR", "tipo": "28-44902875", "ip": "", "lat": -38.958313, "lon": -68.118107}, {"id": 6384, "nombre": "Deleg. Isidro GavilAn", "ciudad": "Isidro GavilAn", "direccion": "Teodoro Planas y El Cholar, Neuquen.", "marca": "Sucursal", "modelo": "NCR", "tipo": "28-44902876", "ip": "", "lat": -38.958313, "lon": -68.118107}, {"id": 6385, "nombre": "Ext. Greg. Álvarez  - Deleg. Godoy", "ciudad": "Gregorio Alvarez", "direccion": "Av. Del Trabajador y Collon Cura, Neuquen.", "marca": "DN", "modelo": "NCR", "tipo": "28-44902877", "ip": "", "lat": -38.944659, "lon": -68.100682}, {"id": 6388, "nombre": "Suc. Barrios Zapala", "ciudad": "Barrios Zapala", "direccion": "Av. 12 de Julio y Lamadrid, Zapala.", "marca": "NCR", "modelo": "NCR", "tipo": "28-44902887", "ip": "", "lat": -38.89645, "lon": -70.076298}, {"id": 6389, "nombre": "Consejo Prov. Educ.  - Neuquén", "ciudad": "Consejo Provincial de Educacion", "direccion": "Belgrano y Colon, Neuquen.", "marca": "DN", "modelo": "DN", "tipo": "J811002387", "ip": "", "lat": -38.950617, "lon": -68.078395}, {"id": 6390, "nombre": "Casa Matriz", "ciudad": "Casa Matriz", "direccion": "Av. Argentina 41, Neuquen.", "marca": "DN", "modelo": "NCR", "tipo": "28-44902885", "ip": "", "lat": -38.954775, "lon": -68.058835}, {"id": 6391, "nombre": "Casa Matriz", "ciudad": "Casa Matriz", "direccion": "Av. Argentina 41, Neuquen.", "marca": "DN", "modelo": "NCR", "tipo": "28-44902886", "ip": "", "lat": -38.954775, "lon": -68.058835}, {"id": 6392, "nombre": "Paso Aguerre  -  Zapala", "ciudad": "Paso Aguerre", "direccion": "Los Alamos y 5 de Diciembre, Paso Aguerre.", "marca": "NCR", "modelo": "DIEBOLD", "tipo": "1720-R33-01371", "ip": "", "lat": -38.40747, "lon": -70.033689}, {"id": 6394, "nombre": "Moquehue  - Aluminé", "ciudad": "Moquehue", "direccion": "Ruta Provincial n° 11, Moquehue.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG602725", "ip": "", "lat": -38.942553, "lon": -71.328362}, {"id": 6396, "nombre": "Ext. Jubilados Zapala", "ciudad": "Jubilados Zapala", "direccion": "Etcheluz 543, Zapala.", "marca": "NCR", "modelo": "NCR", "tipo": "83-45452963", "ip": "", "lat": -38.904446, "lon": -70.063318}, {"id": 6397, "nombre": "Ext. Jubilados Zapala", "ciudad": "Jubilados Zapala", "direccion": "Etcheluz 543, Zapala.", "marca": "NCR", "modelo": "NCR", "tipo": "28-44902892", "ip": "", "lat": -38.904446, "lon": -70.063318}, {"id": 6398, "nombre": "Ext. Jubilados Zapala", "ciudad": "Jubilados Zapala", "direccion": "Etcheluz 543, Zapala.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG805963", "ip": "", "lat": -38.904446, "lon": -70.063318}, {"id": 6399, "nombre": "Suc.  Loncopué", "ciudad": "Loncopue", "direccion": "Av. Hualcupen y colectora Cerro Nevado, Loncopue.", "marca": "NCR", "modelo": "NCR", "tipo": "28-44902861", "ip": "", "lat": -38.074113, "lon": -70.61249}, {"id": 9600, "nombre": "Suc.  Loncopué", "ciudad": "Loncopue", "direccion": "Av. Hualcupen y colectora Cerro Nevado, Loncopue.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "5310140470", "ip": "", "lat": -38.074113, "lon": -70.61249}, {"id": 9601, "nombre": "Suc. Piedra del Aguila", "ciudad": "Piedra del Aguila", "direccion": "Conrado Villegas 52, Piedra del Aguila.", "marca": "NCR", "modelo": "NCR", "tipo": "28-44269889", "ip": "", "lat": -40.049901, "lon": -70.07773}, {"id": 9602, "nombre": "Ext. Jubilados Junin de los Andes", "ciudad": "Jubilados Junin de los Andes", "direccion": "Coronel SuArez 26, Junin de los Andes.", "marca": "NCR", "modelo": "NCR", "tipo": "28-44269888", "ip": "", "lat": -39.95031, "lon": -71.075225}, {"id": 9603, "nombre": "Ext. Banca Empresas Plottier", "ciudad": "Banca Empresas Plottier", "direccion": "Las Lajas 86, Plottier.", "marca": "Sucursal", "modelo": "NCR", "tipo": "28-44902873", "ip": "", "lat": -38.952848, "lon": -68.231105}, {"id": 9604, "nombre": "Suc. Cipolletti", "ciudad": "Cipolletti", "direccion": "Hipolito Irigoyen 747, Cipolletti, Rio Negro.", "marca": "NCR", "modelo": "NCR", "tipo": "83-45452964", "ip": "", "lat": -38.939041, "lon": -67.991281}, {"id": 9605, "nombre": "Suc. Cipolletti", "ciudad": "Cipolletti", "direccion": "Hipolito Irigoyen 747, Cipolletti, Rio Negro.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "5310325013", "ip": "", "lat": -38.939041, "lon": -67.991281}, {"id": 9606, "nombre": "Suc. Cipolletti", "ciudad": "Cipolletti", "direccion": "Hipolito Irigoyen 747, Cipolletti, Rio Negro.", "marca": "DN", "modelo": "DIEBOLD", "tipo": "1720-RHI-00027", "ip": "", "lat": -38.939041, "lon": -67.991281}, {"id": 9607, "nombre": "Suc. Área Centro", "ciudad": "Area Centro Plaza Huincul", "direccion": "Keidel 1559, Plaza Huincul.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "5310325167", "ip": "", "lat": -38.931223, "lon": -69.210832}, {"id": 9608, "nombre": "Suc. Área Centro", "ciudad": "Area Centro Plaza Huincul", "direccion": "Keidel 1559, Plaza Huincul.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "5310325217", "ip": "", "lat": -38.931223, "lon": -69.210832}, {"id": 9609, "nombre": "Suc. Área Centro", "ciudad": "Area Centro Plaza Huincul", "direccion": "Keidel 1559, Plaza Huincul.", "marca": "DN", "modelo": "DN", "tipo": "J811002329", "ip": "", "lat": -38.931223, "lon": -69.210832}, {"id": 9610, "nombre": "Suc. Combate de San Lorenzo", "ciudad": "Combate de San Lorenzo y San Martin", "direccion": "Combate de San Lorenzo y San Martin, Neuquen.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG602723", "ip": "", "lat": -38.95477, "lon": -68.089577}, {"id": 9611, "nombre": "Suc. Combate de San Lorenzo", "ciudad": "Combate de San Lorenzo y San Martin", "direccion": "Combate de San Lorenzo y San Martin, Neuquen.", "marca": "DN", "modelo": "WINCOR", "tipo": "56HG805974", "ip": "", "lat": -38.95477, "lon": -68.089577}, {"id": 9612, "nombre": "Suc. Combate de San Lorenzo", "ciudad": "Combate de San Lorenzo y San Martin", "direccion": "Combate de San Lorenzo y San Martin, Neuquen.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "5310140365", "ip": "", "lat": -38.95477, "lon": -68.089577}, {"id": 9613, "nombre": "Suc. Añelo", "ciudad": "Añelo", "direccion": "Calle 3 s/n, entre Av. Jorge Tanuz y calle 15, Añelo.", "marca": "DN", "modelo": "DN", "tipo": "J811002300", "ip": "", "lat": -38.353835, "lon": -68.787466}, {"id": 9614, "nombre": "Suc. Chos Malal", "ciudad": "Chos Malal", "direccion": "25 de Mayo 540, Chos Malal.", "marca": "DN", "modelo": "NCR", "tipo": "83-45452965", "ip": "", "lat": -37.378875, "lon": -70.272721}, {"id": 9615, "nombre": "Paseo del Oeste - Neuquén", "ciudad": "Shopping del Oeste", "direccion": "Dr. Luis Ramon y Reconquista, Neuquen.", "marca": "DN", "modelo": "DIEBOLD", "tipo": "1720-RHI-00028", "ip": "", "lat": -38.941956, "lon": -68.114607}, {"id": 9616, "nombre": "Poder Judicial Neuquén", "ciudad": "Poder Judicial", "direccion": "Dr. Federico Leloir 672, Neuquen.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "5310190277", "ip": "", "lat": -38.941821, "lon": -68.049629}, {"id": 9617, "nombre": "Poder Judicial Neuquén", "ciudad": "Poder Judicial", "direccion": "Dr. Federico Leloir 672, Neuquen.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG805986", "ip": "", "lat": -38.941821, "lon": -68.049629}, {"id": 9618, "nombre": "Poder Judicial", "ciudad": "Poder Judicial", "direccion": "Dr. Federico Leloir 672, Neuquen.", "marca": "Neutro", "modelo": "NCR", "tipo": "28-57651882", "ip": "", "lat": -38.941821, "lon": -68.049629}, {"id": 9619, "nombre": "Suc. Alta Barda", "ciudad": "Alta Barda", "direccion": "Los Pensamientos 896, Neuquen.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "5310140348", "ip": "", "lat": -38.933449, "lon": -68.070847}, {"id": 9620, "nombre": "Suc. Alta Barda", "ciudad": "Alta Barda", "direccion": "Los Pensamientos 896, Neuquen.", "marca": "NCR", "modelo": "NCR", "tipo": "28-44269887", "ip": "", "lat": -38.933449, "lon": -68.070847}, {"id": 9621, "nombre": "Suc. Alta Barda", "ciudad": "Alta Barda", "direccion": "Los Pensamientos 896, Neuquen.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG602724", "ip": "", "lat": -38.933449, "lon": -68.070847}, {"id": 9622, "nombre": "Suc. Alta Barda", "ciudad": "Alta Barda", "direccion": "Los Pensamientos 896, Neuquen.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG602722", "ip": "", "lat": -38.933449, "lon": -68.070847}, {"id": 9623, "nombre": "Barrio Uriburu -  Chos Malal", "ciudad": "B° Uriburu", "direccion": "Atahualpa Yupanqui s/n, entre San Eduardo y San Cayetano, Chos Malal.", "marca": "NCR", "modelo": "NCR", "tipo": "28-57651885", "ip": "", "lat": -37.357753, "lon": -70.269472}, {"id": 9624, "nombre": "Suc. Picún Leufú", "ciudad": "Picun Leufu", "direccion": "Primeros Pobladores s/n, Picun Leufu.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "5310000147", "ip": "", "lat": -39.518301, "lon": -69.290885}, {"id": 9625, "nombre": "Casa Matriz", "ciudad": "Casa Matriz", "direccion": "Av. Argentina 41, Neuquen.", "marca": "DN", "modelo": "WINCOR", "tipo": "5310190223", "ip": "", "lat": -38.954775, "lon": -68.058835}, {"id": 9626, "nombre": "Casa Matriz", "ciudad": "Casa Matriz", "direccion": "Av. Argentina 41, Neuquen.", "marca": "DN", "modelo": "WINCOR", "tipo": "5310190257", "ip": "", "lat": -38.954775, "lon": -68.058835}, {"id": 9628, "nombre": "El Cholar", "ciudad": "El Cholar", "direccion": "Ruta 6 y Jose Obregon - El Cholar", "marca": "NCR", "modelo": "NCR", "tipo": "28-44902831", "ip": "", "lat": -37.442781, "lon": -70.641974}, {"id": 9629, "nombre": "Puente Picún Leufú", "ciudad": "Puente Picun Leufu", "direccion": "Ruta Nacional 40 km 2346, Puente Picun Leufu.", "marca": "DIEBOLD", "modelo": "DIEBOLD", "tipo": "1720-R33-00473", "ip": "", "lat": -39.209408, "lon": -70.065262}, {"id": 9630, "nombre": "Los Catutos", "ciudad": "Los Catutos", "direccion": "Ruta acceso comision de fomento km 4, Los Catutos.", "marca": "DIEBOLD", "modelo": "DIEBOLD", "tipo": "1720-VGR-01101", "ip": "", "lat": -38.836458, "lon": -70.197288}, {"id": 9632, "nombre": "Ext. Villa Pehuenia", "ciudad": "Villa Pehuenia", "direccion": "Ruta Provincial n° 13, Km 118, Villa Pehuenia.", "marca": "NCR", "modelo": "NCR", "tipo": "28-44269893", "ip": "", "lat": -38.880132, "lon": -71.17421}, {"id": 9633, "nombre": "El Sauce", "ciudad": "El Sauce", "direccion": "Mirta Carrasquera S/N esq. Av. Pedro Salvatori, El Sauce.", "marca": "DIEBOLD", "modelo": "DIEBOLD", "tipo": "1720-R33-00474", "ip": "", "lat": -39.478556, "lon": -69.531369}, {"id": 9634, "nombre": "Octavio Pico", "ciudad": "Octavio Pico", "direccion": "Domingo Fernandez s/n esq. Juan Fernandez, Octavio Pico.", "marca": "DIEBOLD", "modelo": "DIEBOLD", "tipo": "1720-R33-00469", "ip": "", "lat": -37.590238, "lon": -68.257274}, {"id": 9635, "nombre": "Villa Curi Leuvú", "ciudad": "Villa Curi Leuvu", "direccion": "Ruta Provincial 41, km 17, Villa Curi Leuvu.", "marca": "DIEBOLD", "modelo": "DIEBOLD", "tipo": "1720-R33-00472", "ip": "", "lat": -37.130419, "lon": -70.3984}, {"id": 9636, "nombre": "Aguada San Roque", "ciudad": "Aguada San Roque", "direccion": "Ruta acceso comision de fomento km 16,5, Aguada San Roque.", "marca": "DIEBOLD", "modelo": "DIEBOLD", "tipo": "1720-VGR-01102", "ip": "", "lat": -37.998521, "lon": -68.922507}, {"id": 9637, "nombre": "Santo Tomás", "ciudad": "Santo Tomas", "direccion": "Las Bardas s/n entre Los Sauces y Los Olmos, Santo TomAs.", "marca": "DIEBOLD", "modelo": "DIEBOLD", "tipo": "1617316", "ip": "", "lat": -39.822964, "lon": -70.101059}, {"id": 9638, "nombre": "Chorriaca", "ciudad": "Chorriaca", "direccion": "Loncopue s/n interseccion Caviahue, Chorriaca.", "marca": "DIEBOLD", "modelo": "DIEBOLD", "tipo": "1617319", "ip": "", "lat": -37.937391, "lon": -70.101552}, {"id": 9640, "nombre": "Ramón Castro", "ciudad": "Ramon Castro", "direccion": "Ruta Provincial N° 34 KM 6, Ramon Castro.", "marca": "DIEBOLD", "modelo": "DIEBOLD", "tipo": "1720-R33-01306", "ip": "", "lat": -38.863989, "lon": -69.743483}, {"id": 9641, "nombre": "Suc. S. Martín de los Andes", "ciudad": "San Martin de los Andes", "direccion": "Belgrano 990, San Martin de los Andes.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG805957", "ip": "", "lat": -40.158365, "lon": -71.348576}, {"id": 9642, "nombre": "Deleg. Vega Maipu", "ciudad": "Vega Maipu", "direccion": "Luis Goñi 17, San Martin de los Andes.", "marca": "Sucursal", "modelo": "WINCOR", "tipo": "56HG805959", "ip": "", "lat": -40.127739, "lon": -71.248524}, {"id": 9643, "nombre": "Salón Bicentenario de J de los Andes", "ciudad": "Salon del Bicentenario de Junin de los Andes", "direccion": "Gines Ponte 530, Junin de los Andes.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG805965", "ip": "", "lat": -39.5701, "lon": -71.0417}, {"id": 9644, "nombre": "La Anónima Cutral Có", "ciudad": "La Anonima Cutral Co", "direccion": "Av. Miguel Eguinoa 1802, Cutral Co.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG805968", "ip": "", "lat": -38.949222, "lon": -69.21604}, {"id": 9645, "nombre": "Suc. Aluminé", "ciudad": "Alumine", "direccion": "Torcuato Modarelli 500, Alumine.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "5310140262", "ip": "", "lat": -39.23489, "lon": -70.916046}, {"id": 9646, "nombre": "Suc. Aluminé", "ciudad": "Alumine", "direccion": "Torcuato Modarelli 500, Alumine.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG805961", "ip": "", "lat": -39.23489, "lon": -70.916046}, {"id": 9647, "nombre": "Suc. Aluminé", "ciudad": "Alumine", "direccion": "Torcuato Modarelli 500, Alumine.", "marca": "DN", "modelo": "NCR", "tipo": "28-44902893", "ip": "", "lat": -39.23489, "lon": -70.916046}, {"id": 9648, "nombre": "Suc. Junín de los Andes", "ciudad": "Junin de los Andes", "direccion": "San Martin y Lamadrid, Junin de los Andes.", "marca": "DN", "modelo": "WINCOR", "tipo": "5310190180", "ip": "", "lat": -39.950252, "lon": -71.07145}, {"id": 9649, "nombre": "Villa del Nahueve", "ciudad": "Villa del Nahueve", "direccion": "Ruta Provincial 44 Km 20 calle Paraje Los Carrizos S/N, Villa del Nahueve.", "marca": "DIEBOLD", "modelo": "DIEBOLD", "tipo": "1720-R33-00477", "ip": "", "lat": -37.120556, "lon": -70.769167}, {"id": 9650, "nombre": "Cas Matriz", "ciudad": "Casa Matriz", "direccion": "Av. Argentina 41, Neuquen.", "marca": "DN", "modelo": "WINCOR", "tipo": "5310141886", "ip": "", "lat": -38.954775, "lon": -68.058835}, {"id": 9651, "nombre": "Chihuidos", "ciudad": "Chihuidos", "direccion": "Ruta Provincial N° 1 - KM 80, Chihuidos.", "marca": "DIEBOLD", "modelo": "DIEBOLD", "tipo": "1720-R33-01370", "ip": "", "lat": -38.241389, "lon": -69.483889}, {"id": 9652, "nombre": "Sauzal Bonito", "ciudad": "Sauzal Bonito", "direccion": "Calle principal Paraje Sauzal Bonito Lote n° 27, Sauzal Bonito.", "marca": "DIEBOLD", "modelo": "DIEBOLD", "tipo": "1720-VGR-01111", "ip": "", "lat": -38.601666, "lon": -69.105277}, {"id": 9653, "nombre": "Jefatura de Policía", "ciudad": "Jefatura de Policia", "direccion": "Richieri 775, Neuquen.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG805973", "ip": "", "lat": -38.962685, "lon": -68.048308}, {"id": 9654, "nombre": "Suc. Andacollo", "ciudad": "Andacollo", "direccion": "Huaraco y Cordillera del Viento, Andacollo.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG805976", "ip": "", "lat": -37.181356, "lon": -70.667315}, {"id": 9655, "nombre": "Suc. Villa la Angostura", "ciudad": "Villa La Angostura", "direccion": "Av. Nahuel Huapi 70, Villa La Angostura.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "5310140383", "ip": "", "lat": -40.762978, "lon": -71.648082}, {"id": 9656, "nombre": "Petroeste", "ciudad": "Petroeste", "direccion": "Autovia de Circunvalacion Neuquen/Plottier -  Km 1458; Neuquen.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG805977", "ip": "", "lat": -38.911231, "lon": -68.144649}, {"id": 9657, "nombre": "Suc. San Patricio del Chañar", "ciudad": "San Patricio del Chañar", "direccion": "Av. Pilmayquen 150, San Patricio del Chañar.", "marca": "NCR", "modelo": "NCR", "tipo": "28-44902862", "ip": "", "lat": -38.626311, "lon": -68.299694}, {"id": 9658, "nombre": "Suc. Las Lajas", "ciudad": "Las Lajas", "direccion": "Alsina 468, Las Lajas.", "marca": "DIEBOLD", "modelo": "DIEBOLD", "tipo": "1720-VGR-01100", "ip": "", "lat": -38.525177, "lon": -70.360921}, {"id": 9659, "nombre": "Paseo De La Costa", "ciudad": "Paseo De La Costa", "direccion": "Tte. De Navio Eliana M. Krawczyk S/N piso Lote B1. Neuquen.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "5310164410", "ip": "", "lat": -38.97831, "lon": -68.052622}, {"id": 9660, "nombre": "Paseo De La Costa", "ciudad": "Paseo De La Costa", "direccion": "Tte. De Navio Eliana M. Krawczyk S/N piso Lote B1. Neuquen.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG805970", "ip": "", "lat": -38.97831, "lon": -68.052622}, {"id": 9661, "nombre": "Suc. Senillosa", "ciudad": "Senillosa", "direccion": "Misiones 240, Senillosa.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "5310140411", "ip": "", "lat": -39.013997, "lon": -68.427282}, {"id": 9662, "nombre": "Senillosa Municipalidad", "ciudad": "Senillosa Municipalidad", "direccion": "Avenida San Martin 56, Senillosa.", "marca": "DN", "modelo": "DN", "tipo": "J811002355", "ip": "", "lat": -39.008909, "lon": -68.42723}, {"id": 9663, "nombre": "Comisión Vecinal Villa Maria", "ciudad": "Comision Vecinal Villa Maria", "direccion": "Av. Olascoaga 1100, Neuquen", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG805980", "ip": "", "lat": -38.967093, "lon": -68.059075}, {"id": 9665, "nombre": "Covunco Abajo", "ciudad": "Covunco Abajo", "direccion": "Ruta Provincial n° 16 – Km 45, Covunco Abajo.", "marca": "DIEBOLD", "modelo": "DIEBOLD", "tipo": "1617308", "ip": "", "lat": -38.582778, "lon": -69.763056}, {"id": 9666, "nombre": "Comisión Vecinal Provincias Unidas", "ciudad": "Comision Vecinal Provincias Unidas", "direccion": "Islas Malvinas 1900, Neuquén.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG805978", "ip": "", "lat": -38.966074, "lon": -68.038134}, {"id": 9667, "nombre": "Comisión Vecinal Terrazas del Neuquén", "ciudad": "Comision Vecinal Terrazas del Neuquen", "direccion": "Cabellera del Frio 720, Neuquen.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG805998", "ip": "", "lat": -38.927559, "lon": -68.081671}, {"id": 9668, "nombre": "Comisión Vecinal Sapere", "ciudad": "Comision Vecinal Sapere", "direccion": "Carmen de Patagones y Cabo de Hornos, Neuquen.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG805982", "ip": "", "lat": -38.952192, "lon": -68.037568}, {"id": 9669, "nombre": "Comisión Vecinal Barrio Villa Farrel", "ciudad": "Comision Vecinal Barrio Villa Farrel", "direccion": "Rio Diamante 276 y Juan XXIII, Neuquen.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG805984", "ip": "", "lat": -38.952192, "lon": -68.037568}, {"id": 9670, "nombre": "Comisión Vecinal Barrio La Sirena", "ciudad": "Comision Vecinal Barrio La Sirena", "direccion": "Calle Lanin 1500, Neuquen.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG805987", "ip": "", "lat": -38.964672, "lon": -68.081134}, {"id": 9671, "nombre": "Comisión Vecinal Barrio Valentina Sur", "ciudad": "Comision Vecinal Barrio Valentina Sur", "direccion": "El Dorado y Jose Bustos Perez, Neuquen.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG805983", "ip": "", "lat": -38.965447, "lon": -68.118923}, {"id": 9672, "nombre": "Comision Vecinal Altos del Limay", "ciudad": "Comision Vecinal Altos del Limay", "direccion": "Teniente Candelaria y Fangio, Neuquen.", "marca": "NCR", "modelo": "DN", "tipo": "J811002256", "ip": "", "lat": -38.980713, "lon": -68.077522}, {"id": 9673, "nombre": "Comisaria Parque Industrial Neuquén", "ciudad": "Comisaria Parque Industrial Neuquen", "direccion": "Ruta 7 Km 3, Neuquen.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG805971", "ip": "", "lat": -38.911227, "lon": -68.080895}, {"id": 9674, "nombre": "Quili Malal", "ciudad": "Quili Malal", "direccion": "Ruta Provincial N° 10, KM 27, Quili Malal", "marca": "DIEBOLD", "modelo": "DIEBOLD", "tipo": "1720-R33-01369", "ip": "", "lat": -38.326111, "lon": -69.814444}, {"id": 9675, "nombre": "San Martin de los Andes  - B° Chacra 30", "ciudad": "San Martin de los Andes", "direccion": "Av. Los Lagos N° 1729, San Martin de los Andes.", "marca": "DIEBOLD", "modelo": "DIEBOLD", "tipo": "1720-R33-00476", "ip": "", "lat": -40.12908, "lon": -71.227133}, {"id": 9676, "nombre": "Chos Malal - Cordillera del Viento", "ciudad": "Chos Malal", "direccion": "Misiones Esquina San Luis, Lote 10 Manzana 171.", "marca": "NCR", "modelo": "NCR", "tipo": "28-57651886", "ip": "", "lat": -37.365265, "lon": -70.26309}, {"id": 9677, "nombre": "Plottier - B° Los Álamos", "ciudad": "Plottier", "direccion": "Joaquin V. GonzAlez y Palermo. Plottier.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG805989", "ip": "", "lat": -38.951393, "lon": -68.188555}, {"id": 9678, "nombre": "Los Guañacos", "ciudad": "Los Guañacos", "direccion": "Ruta Provincial 57 km 12, Los Guañacos.", "marca": "NCR", "modelo": "DIEBOLD", "tipo": "1720-R33-00471", "ip": "", "lat": -37.270278, "lon": -70.766667}, {"id": 9679, "nombre": "Centenario - B° Sarmiento Polideportivo", "ciudad": "Centenario", "direccion": "CanadA entre Av. Coronel Villegas y  Brasil, Centenario", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG805979", "ip": "", "lat": -38.832692, "lon": -68.133344}, {"id": 9680, "nombre": "Coyuco Cochico", "ciudad": "Coyuco Cochico", "direccion": "Seccion XXIX fraccion D mza 2 Lote2, Coyuco Cochico.", "marca": "DIEBOLD", "modelo": "DIEBOLD", "tipo": "1617320", "ip": "", "lat": -38.326375, "lon": -69.814566}, {"id": 9681, "nombre": "Plottier - Terminal de Ómnibus", "ciudad": "Plottier", "direccion": "Leopoldo Lugones y Santa Fe Sur, Plottier.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG805990", "ip": "", "lat": -38.956203, "lon": -68.217858}, {"id": 9682, "nombre": "Centenario  - B° Eluney", "ciudad": "Centenario", "direccion": "CanadA S/N y Presidente Hector Jose CAmpora, Centenario.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG805988", "ip": "", "lat": -38.81191, "lon": -68.15376}, {"id": 9683, "nombre": "Chos Malal - Terminal de Ómnibus", "ciudad": "Chos Malal", "direccion": "Neuquen y Gral Paz, Chos Malal.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG805991", "ip": "", "lat": -37.38137, "lon": -70.26518}, {"id": 9684, "nombre": "Plaza Huincul - Sanatorio Petroleros", "ciudad": "Plaza Huincul", "direccion": "Carmen Funes 1000, Plaza Huincul", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG805975", "ip": "", "lat": -38.926666, "lon": -69.200555}, {"id": 9685, "nombre": "San Martin de los Andes  - B° El Arenal", "ciudad": "San Martin de los Andes", "direccion": "Don Bosco 7, San Martin de los Andes.", "marca": "DIEBOLD", "modelo": "DIEBOLD", "tipo": "1617307", "ip": "", "lat": -40.148152, "lon": -71.313891}, {"id": 9686, "nombre": "Junín de los Andes - Hospital", "ciudad": "Junin de los Andes", "direccion": "Av. AntArtida Argentina n° 150, Junin de los Andes.", "marca": "DN", "modelo": "DIEBOLD", "tipo": "1617309", "ip": "", "lat": -39.94885, "lon": -71.077041}, {"id": 9687, "nombre": "Plottier  - B° Los Troncos", "ciudad": "Plottier B° Los Troncos", "direccion": "General Roca S/N y Esquina Las Carmelas, Plottier.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG805992", "ip": "", "lat": -38.947379, "lon": -68.237846}, {"id": 9688, "nombre": "Neuquén -  B° Rincón de Emilio", "ciudad": "Neuquen B° Rincon de Emilio", "direccion": "Oceania 80, Neuquen.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG805994", "ip": "", "lat": -38.926893, "lon": -68.051098}, {"id": 9692, "nombre": "Neuquén - B° Islas Malvinas", "ciudad": "Neuquen B° Islas Malvinas", "direccion": "Maestro Emma Carlos 958, Neuquen.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG805995", "ip": "", "lat": -38.944189, "lon": -68.082388}, {"id": 9693, "nombre": "Piedra del Águila Turismo", "ciudad": "Piedra del Aguila Turismo", "direccion": "Gregorio Alvarez 1030, Piedra del Aguila", "marca": "DN", "modelo": "DN", "tipo": "J811002272", "ip": "", "lat": -40.039272, "lon": -70.068715}, {"id": 9694, "nombre": "Neuquén B° Melipal", "ciudad": "Neuquen B° Melipal", "direccion": "Radal 3300, Neuquen", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG805996", "ip": "", "lat": -38.93951, "lon": -68.105304}, {"id": 9695, "nombre": "Neuquén B° Canal V", "ciudad": "Neuquen B° Canal V", "direccion": "Ciudad de Rio Gallegos 224, Neuquen", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG805997", "ip": "", "lat": -38.952532, "lon": -68.121353}, {"id": 9696, "nombre": "Zapala - B° Don Bosco", "ciudad": "Zapala", "direccion": "Av. Eva Peron n° 292 esquina Martin Petry, Zapala.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG805999", "ip": "", "lat": -38.898044, "lon": -70.052705}, {"id": 9697, "nombre": "Ext. Buta Ranquil", "ciudad": "Buta Ranquil", "direccion": "San Martin y Belgrano, Buta Ranquil.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG805960", "ip": "", "lat": -37.051402, "lon": -69.878558}, {"id": 9698, "nombre": "Neuquén Barda Soleadas", "ciudad": "Neuquen Barda Soleadas", "direccion": "Doctor David Abraham y Gobernador Asmar, Neuquen", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG805964", "ip": "", "lat": -38.937515, "lon": -68.087638}, {"id": 9699, "nombre": "Pilolil", "ciudad": "Pilo Lil", "direccion": "Ruta Provincial N° 23 KM 0.5, Pilo Lil.", "marca": "DIEBOLD", "modelo": "DIEBOLD", "tipo": "1720-R33-01368", "ip": "", "lat": -39.604298, "lon": -70.932706}, {"id": 21201, "nombre": "Suc. Loncopue", "ciudad": "Loncopue", "direccion": "Av. Hualcupen y colectora Cerro Nevado, Loncopue.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG805958", "ip": "", "lat": -38.074113, "lon": -70.61249}, {"id": 21202, "nombre": "Univ. Del comahue", "ciudad": "Universidad del Comahue", "direccion": "Av. Argentina 1501, Neuquen.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG805993", "ip": "", "lat": -38.939556, "lon": -68.058704}, {"id": 21210, "nombre": "Municip Zapala", "ciudad": "Municipalidad de Zapala", "direccion": "Avenida San Martin y Mayor Torres, Zapala.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG805955", "ip": "", "lat": -38.902787, "lon": -70.065521}, {"id": 21211, "nombre": "Ext. Gregorio Álvarez", "ciudad": "Gregorio Alvarez", "direccion": "Av. Del Trabajador y Collon Cura, Neuquen.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG805956", "ip": "", "lat": -38.944659, "lon": -68.100682}, {"id": 21212, "nombre": "Ext .Vista Alegre Sur", "ciudad": "Vista Alegre Sur", "direccion": "Eduardo Meschini 61, Vista Alegre Sur.", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "56HG805972", "ip": "", "lat": -38.772986, "lon": -68.13456}, {"id": 21214, "nombre": "Ruca Choroy", "ciudad": "Ruca Choroy", "direccion": "Ruta Provincial 18 km 13, Ruca Choroy.", "marca": "DIEBOLD", "modelo": "DIEBOLD", "tipo": "1720-VGR-01110", "ip": "", "lat": -39.214912, "lon": -71.138605}, {"id": 21215, "nombre": "Ext. El Huecu", "ciudad": "El Huecu", "direccion": "Belgrano y Rivera de arroyo Huecu, El Huecu.", "marca": "NCR", "modelo": "NCR", "tipo": "28-57651893", "ip": "", "lat": -37.644983, "lon": -70.582972}, {"id": 21216, "nombre": "B° Fatorello-CGT", "ciudad": "Zapala", "direccion": "9 de Julio y Buenos Aires, Zapala", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "J821016386", "ip": "", "lat": -38.889205, "lon": -70.069707}, {"id": 21216, "nombre": "B° Fatorello-CGT", "ciudad": "Zapala", "direccion": "9 de Julio y Buenos Aires, Zapala", "marca": "WINCOR", "modelo": "WINCOR", "tipo": "J821016386", "ip": "", "lat": -38.889205, "lon": -70.069707}, {"id": 21217, "nombre": "Arroyito", "ciudad": "Arroyito", "direccion": "Calle 204 n° 935, Arroyito.", "marca": "DIEBOLD", "modelo": "DIEBOLD", "tipo": "1720-R33-01366", "ip": "", "lat": -39.071618, "lon": -68.567448}, {"id": 21217, "nombre": "Arroyito", "ciudad": "Arroyito", "direccion": "Calle 204 n° 935, Arroyito.", "marca": "DIEBOLD", "modelo": "DIEBOLD", "tipo": "1720-VGR-01110", "ip": "", "lat": -39.071618, "lon": -68.567448}, {"id": 21218, "nombre": "Suc. San Martin de los Andes", "ciudad": "San Martin de los Andes", "direccion": "Belgrano 990, San Martin de los Andes.", "marca": "DN", "modelo": "WINCOR", "tipo": "5310190211", "ip": "", "lat": -40.158365, "lon": -71.348576}, {"id": 21218, "nombre": "Suc. San Martin de los Andes", "ciudad": "San Martin de los Andes", "direccion": "Belgrano 990, San Martin de los Andes.", "marca": "DN", "modelo": "WINCOR", "tipo": "5310190257", "ip": "", "lat": -40.158365, "lon": -71.348576}, {"id": 21219, "nombre": "Ext. Jubilados Casa Matriz", "ciudad": "Jubilados Casa Matriz", "direccion": "Av. Argentina 51, Neuquén.", "marca": "Sucursal", "modelo": "DIEBOLD", "tipo": "1720-R33-01367", "ip": "", "lat": -38.954633, "lon": -68.058993}], "ciudades": ["Aeropuerto Neuquen", "Aguada San Roque", "Alcorta", "Alta Barda", "Alumine", "Andacollo", "Area Centro Plaza Huincul", "Arroyito", "Añelo", "Banca Empresas Plottier", "Barrancas", "Barrios Zapala", "Buenos Aires", "Buta Ranquil", "B° Progreso", "B° Uriburu", "Campo Grande", "Capriolo", "Casa Matriz", "Caviahue", "Centenario", "Chihuidos", "Choele Choel", "Chorriaca", "Chos Malal", "Cipolletti", "Combate de San Lorenzo y San Martin", "Comisaria Parque Industrial Neuquen", "Comision Vecinal Altos del Limay", "Comision Vecinal Barrio La Sirena", "Comision Vecinal Barrio Valentina Sur", "Comision Vecinal Barrio Villa Farrel", "Comision Vecinal Provincias Unidas", "Comision Vecinal Sapere", "Comision Vecinal Terrazas del Neuquen", "Comision Vecinal Villa Maria", "Consejo Provincial de Educacion", "Covunco Abajo", "Coyuco Cochico", "Cutral Co", "E.T.O.N.", "El Cholar", "El Huecu", "El Sauce", "Felix San Martin", "General Roca", "Godoy", "Gregorio Alvarez", "Hospital Castro Rendon", "Hospital Heller", "Huinganco", "Instituto de Seguridad Social Neuquen", "Isidro GavilAn", "Jefatura de Policia", "Jubilados Casa Matriz", "Jubilados Junin de los Andes", "Jubilados Zapala", "Junin de los Andes", "LUNCEC", "La Anonima Cutral Co", "Las Coloradas", "Las Grutas", "Las Lajas", "Las Ovejas", "Loncopue", "Los Catutos", "Los Guañacos", "Los Miches", "Manzano Amargo", "Mariano Moreno", "Moquehue", "Municipalidad de Neuquen", "Municipalidad de Zapala", "Neuquen Barda Soleadas", "Neuquen B° Canal V", "Neuquen B° Islas Malvinas", "Neuquen B° Melipal", "Neuquen B° Rincon de Emilio", "Octavio Pico", "Parque Industrial Neuquen", "Paseo De La Costa", "Paso Aguerre", "Petroeste", "Picun Leufu", "Piedra del Aguila", "Piedra del Aguila Turismo", "Pilo Lil", "Plaza Huincul", "Plottier", "Plottier B° Los Troncos", "Poder Judicial", "Puente Picun Leufu", "Quili Malal", "Ramon Castro", "Rincon de los Sauces", "Rivadavia", "Ruca Choroy", "Salon del Bicentenario de Junin de los Andes", "San Martin de los Andes", "San Patricio del Chañar", "Santo Tomas", "Sarmiento", "Sauzal Bonito", "Secretaria de Turismo de San Martin de los Andes", "Senillosa", "Senillosa Municipalidad", "Shopping del Oeste", "TaquimilAn", "Tricao Malal", "Unidad Comercial Movil", "Universidad del Comahue", "Varvarco", "Vega Maipu", "Villa Curi Leuvu", "Villa La Angostura", "Villa Pehuenia", "Villa Regina", "Villa Traful", "Villa del Nahueve", "Villa el Chocon", "Vista Alegre", "Vista Alegre Sur", "Zabaleta Plottier", "Zapala"], "marcas": ["DIEBOLD", "DN", "Móvil", "NCR", "Neutro", "Sucursal", "WINCOR"]};
+const todosATMs = DATA.atms;
+
+// ── MAPA ──────────────────────────────────────────────────────────────────────
+const mapa = L.map('mapa', {zoomControl:true}).setView([-38.95, -68.07], 8);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution:'© OpenStreetMap',maxZoom:19
+}).addTo(mapa);
+
+// ── MARCADORES ────────────────────────────────────────────────────────────────
+let marcadores = [];
+let marcadorActivo = null;
+
+function colorMarca(marca){
+  const m = (marca||'').toLowerCase();
+  if(m.includes('ncr'))    return {bg:'#375623',cls:'marca-ncr'};
+  if(m.includes('wincor')) return {bg:'#843C0C',cls:'marca-wincor'};
+  if(m.includes('diebold'))return {bg:'#C9513E',cls:'marca-diebold'};
+  if(m.includes('dn'))     return {bg:'#1F4E79',cls:'marca-dn'};
+  return {bg:'#555',cls:''};
+}
+
+function badgeMarca(marca){
+  const m = (marca||'').toLowerCase();
+  if(m.includes('ncr'))    return `<span class="badge badge-ncr">NCR</span>`;
+  if(m.includes('wincor')) return `<span class="badge badge-wincor">Wincor</span>`;
+  if(m.includes('diebold'))return `<span class="badge badge-diebold">Diebold</span>`;
+  if(m.includes('dn'))     return `<span class="badge badge-dn">DN</span>`;
+  return `<span class="badge badge-otro">${marca||'—'}</span>`;
+}
+
+function crearMarcador(atm){
+  const col = colorMarca(atm.marca);
+  const icon = L.divIcon({
+    className:'',
+    html:`<div class="marker-label ${col.cls}">${atm.id}</div>`,
+    iconAnchor:[20,10]
+  });
+  const m = L.marker([atm.lat, atm.lon], {icon})
+    .on('click', ()=>{ seleccionar(atm); });
+  m._atmData = atm;
+  return m;
+}
+
+// Cluster-like: mostrar todos con marcadores
+const layerGroup = L.layerGroup().addTo(mapa);
+
+function renderMarcadores(lista){
+  layerGroup.clearLayers();
+  marcadores = [];
+  lista.forEach(atm => {
+    const m = crearMarcador(atm);
+    m.addTo(layerGroup);
+    marcadores.push(m);
+  });
+}
+
+// ── FILTROS Y BÚSQUEDA ────────────────────────────────────────────────────────
+const selCiudad = document.getElementById('fil-ciudad');
+const selMarca  = document.getElementById('fil-marca');
+const chipCount = document.getElementById('chip-count');
+const headerCount = document.getElementById('header-count');
+
+// Poblar selects
+DATA.ciudades.forEach(c=>{
+  const o=document.createElement('option'); o.value=c; o.textContent=c;
+  selCiudad.appendChild(o);
+});
+// Marcas (solo hardware)
+['DIEBOLD','DN','NCR','WINCOR'].forEach(m=>{
+  const o=document.createElement('option'); o.value=m; o.textContent=m;
+  selMarca.appendChild(o);
+});
+
+let filtrados = [...todosATMs];
+
+function aplicarFiltros(){
+  const q      = document.getElementById('buscar').value.toLowerCase().trim();
+  const ciudad = selCiudad.value;
+  const marca  = selMarca.value.toLowerCase();
+
+  filtrados = todosATMs.filter(a=>{
+    if(ciudad && a.ciudad !== ciudad) return false;
+    if(marca  && !a.marca.toLowerCase().includes(marca)) return false;
+    if(q){
+      const hay = [a.id.toString(), a.nombre, a.ciudad, a.direccion, a.ip||'']
+                    .join(' ').toLowerCase();
+      if(!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  renderMarcadores(filtrados);
+  renderLista(filtrados);
+  chipCount.textContent = filtrados.length;
+
+  // Ajustar vista
+  if(filtrados.length > 0 && filtrados.length < todosATMs.length){
+    const bounds = L.latLngBounds(filtrados.map(a=>[a.lat,a.lon]));
+    mapa.fitBounds(bounds, {padding:[40,40]});
+  }
+}
+
+document.getElementById('buscar').addEventListener('input', aplicarFiltros);
+
+function limpiar(){
+  document.getElementById('buscar').value='';
+  selCiudad.value='';
+  selMarca.value='';
+  aplicarFiltros();
+  mapa.setView([-38.95,-68.07],8);
+}
+
+// ── LISTA (visible en desktop) ────────────────────────────────────────────────
+function renderLista(lista){
+  const el = document.getElementById('lista');
+  if(!el) return;
+  el.innerHTML = lista.slice(0,200).map(a=>`
+    <div class="lista-item" onclick="seleccionar(DATA.atms.find(x=>x.id===${a.id}))">
+      <h3>🏧 ${a.id} — ${a.nombre}</h3>
+      <p>📍 ${a.ciudad} &nbsp;·&nbsp; ${a.marca}</p>
+    </div>
+  `).join('') + (lista.length>200?`<div style="padding:10px;color:#888;text-align:center;font-size:12px">Mostrando 200 de ${lista.length}. Refiná la búsqueda.</div>`:'');
+}
+
+// ── SELECCIÓN ─────────────────────────────────────────────────────────────────
+function seleccionar(atm){
+  if(!atm) return;
+  mapa.setView([atm.lat, atm.lon], 16);
+  mostrarPanel(atm);
+
+  // Resaltar marcador
+  marcadores.forEach(m=>{
+    const col = colorMarca(m._atmData.marca);
+    const activo = m._atmData.id === atm.id;
+    const icon = L.divIcon({
+      className:'',
+      html:`<div class="marker-label ${col.cls}" style="${activo?'transform:scale(1.4);z-index:999;box-shadow:0 0 0 3px #FFD700':''}">
+              ${m._atmData.id}</div>`,
+      iconAnchor:[20,10]
+    });
+    m.setIcon(icon);
+  });
+}
+
+// ── PANEL INFERIOR ────────────────────────────────────────────────────────────
+function mostrarPanel(atm){
+  const panel = document.getElementById('info-panel');
+  const cont  = document.getElementById('info-contenido');
+
+  const gmapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${atm.lat},${atm.lon}`;
+
+  cont.innerHTML = `
+    <div class="info-header">
+      <div class="info-icon">🏧</div>
+      <div class="info-title">
+        <h2>ATM ${atm.id} — ${atm.nombre}</h2>
+        <p>${atm.ciudad}</p>
+      </div>
+    </div>
+    <div class="info-body">
+      <div class="info-row">
+        <span class="info-label">Dirección</span>
+        <span class="info-val">${atm.direccion||'—'}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Ciudad</span>
+        <span class="info-val">${atm.ciudad||'—'}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Marca</span>
+        <span class="info-val">${badgeMarca(atm.marca)}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Modelo</span>
+        <span class="info-val">${atm.modelo||'—'}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">IP</span>
+        <span class="info-val" id="ip-val">${atm.ip||'<span style="color:#999">No registrada</span>'}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Coords</span>
+        <span class="info-val" style="font-size:12px;color:#888">${atm.lat}, ${atm.lon}</span>
+      </div>
+    </div>
+    <a href="${gmapsUrl}" target="_blank">
+      <button class="btn-ver-mapa">🗺  Cómo llegar en Google Maps</button>
+    </a>
+  `;
+
+  panel.classList.add('visible');
+}
+
+function cerrarPanel(){
+  document.getElementById('info-panel').classList.remove('visible');
+  // Quitar resaltado
+  marcadores.forEach(m=>{
+    const col = colorMarca(m._atmData.marca);
+    const icon = L.divIcon({
+      className:'',
+      html:`<div class="marker-label ${col.cls}">${m._atmData.id}</div>`,
+      iconAnchor:[20,10]
+    });
+    m.setIcon(icon);
+  });
+}
+
+// Cerrar panel al tocar el mapa
+mapa.on('click', cerrarPanel);
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+renderMarcadores(todosATMs);
+renderLista(todosATMs);
+headerCount.textContent = `${todosATMs.length} cajeros`;
+
+</script>
+</body>
+</html>
