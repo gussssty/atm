@@ -12,13 +12,14 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--azul:#1a6db5;--azul2:#2E75B6;--verde:#1B5E20;--bg:#f0f4f8;--gris:#6b7280;--shadow:0 2px 12px rgba(0,0,0,.12)}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:#1a1a2e;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:#1a1a2e;display:flex;flex-direction:column;overflow:hidden;position:fixed;top:0;left:0;right:0;bottom:0}
 
 header{background:var(--azul);color:#fff;padding:10px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.25);z-index:1000;flex-shrink:0}
 header h1{font-size:17px;font-weight:700}
 header span{font-size:11px;opacity:.75;margin-left:auto}
 
 #panel{background:#fff;padding:10px 12px;box-shadow:var(--shadow);z-index:900;flex-shrink:0}
+#mapa{flex:1;min-height:0;touch-action:pan-x pan-y pinch-zoom}
 .search-row{display:flex;gap:8px;margin-bottom:8px}
 #buscar{flex:1;padding:9px 12px;border:1.5px solid #d1d5db;border-radius:10px;font-size:15px;outline:none}
 #buscar:focus{border-color:var(--azul2)}
@@ -30,7 +31,7 @@ select{padding:7px 10px;border:1.5px solid #d1d5db;border-radius:8px;font-size:1
 
 #mapa{flex:1;z-index:1}
 
-#info-panel{position:fixed;bottom:0;left:0;right:0;background:#fff;border-radius:18px 18px 0 0;box-shadow:0 -4px 20px rgba(0,0,0,.18);padding:16px;z-index:2000;transform:translateY(100%);transition:transform .3s ease;max-height:85vh;overflow-y:auto}
+#info-panel{position:fixed;bottom:0;left:0;right:0;background:#fff;border-radius:18px 18px 0 0;box-shadow:0 -4px 20px rgba(0,0,0,.18);padding:16px 16px 32px;z-index:2000;transform:translateY(100%);transition:transform .3s ease;max-height:82vh;overflow-y:scroll;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 #info-panel.visible{transform:translateY(0)}
 .drag-bar{width:40px;height:4px;background:#d1d5db;border-radius:2px;margin:0 auto 14px;cursor:pointer}
 .btn-cerrar{position:absolute;top:14px;right:14px;background:none;border:none;font-size:24px;cursor:pointer;color:var(--gris);line-height:1}
@@ -79,6 +80,13 @@ select{padding:7px 10px;border:1.5px solid #d1d5db;border-radius:8px;font-size:1
 /* Marcadores mapa */
 .mk{background:var(--azul);color:#fff;border-radius:8px;padding:3px 7px;font-size:11px;font-weight:700;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.3);border:2px solid #fff}
 .mk.ncr{background:#375623}.mk.wincor{background:#843C0C}.mk.diebold{background:#C9513E}
+
+
+
+/* Mobile: mapa toca toda la altura disponible */
+@media(max-width:767px){
+  #lista{display:none}
+}
 
 /* Desktop */
 @media(min-width:768px){
@@ -215,7 +223,7 @@ function renderLista(lista){
   el.innerHTML=lista.slice(0,200).map(a=>{
     const cont=a.contactos&&a.contactos[0]?`<p>👤 ${a.contactos[0].nombre} · ${a.contactos[0].rol}</p>`:'';
     return `<div class="li" onclick="sel(TODOS.find(x=>x.id===${a.id}))">
-      <h3>🏧 ${a.id} — ${a.nombre}</h3>
+      <h3><img src="${LOGO}" style="width:16px;height:16px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:5px">${a.id} — ${a.nombre}</h3>
       <p>📍 ${a.ciudad} · ${a.marca}</p>${cont}
     </div>`;
   }).join('')+(lista.length>200?`<div style="padding:10px;text-align:center;font-size:12px;color:#888">Mostrando 200/${lista.length}. Refiná la búsqueda.</div>`:'');
