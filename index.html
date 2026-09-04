@@ -1,4 +1,4 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -58,8 +58,13 @@ select{padding:7px 10px;border:1.5px solid #d1d5db;border-radius:8px;
   box-shadow:0 -4px 20px rgba(0,0,0,.18);padding:14px 16px 32px;
   max-height:58vh;overflow-y:scroll;-webkit-overflow-scrolling:touch;
   overscroll-behavior:contain;flex-shrink:0}
-.drag-bar{width:40px;height:4px;background:#d1d5db;border-radius:2px;
-  margin:0 auto 12px;cursor:pointer}
+.drag-bar{width:60px;height:5px;background:#bfc5ce;border-radius:3px;
+  margin:0 auto 0;cursor:pointer;transition:background .2s}
+.drag-bar:active{background:#1a6db5}
+.drag-bar-wrap{width:100%;padding:10px 0 12px;cursor:pointer;
+  display:flex;justify-content:center;align-items:center;
+  -webkit-tap-highlight-color:rgba(26,109,181,.15)}
+.drag-bar-wrap:active .drag-bar{background:#1a6db5}
 
 /* ── HEADER DEL PANEL ── */
 .d-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;
@@ -177,6 +182,8 @@ select{padding:7px 10px;border:1.5px solid #d1d5db;border-radius:8px;
 
 /* ── DESKTOP ── */
 @media(min-width:768px){
+  #btn-volver{display:none}
+
   #vista-lista{top:calc(52px + 88px);width:360px;bottom:0}
   #vista-mapa{display:flex!important;top:52px;left:360px}
   #btn-volver{display:none}
@@ -220,7 +227,9 @@ select{padding:7px 10px;border:1.5px solid #d1d5db;border-radius:8px;
   <button id="btn-volver" onclick="volverLista()">← Volver</button>
   <div id="mapa"></div>
   <div id="detalle">
-    <div class="drag-bar" onclick="volverLista()"></div>
+    <div class="drag-bar-wrap" onclick="volverLista()" title="Volver al listado">
+      <div class="drag-bar"></div>
+    </div>
     <div id="detalle-body"></div>
   </div>
 </div>
@@ -351,12 +360,33 @@ function mostrarMapa(){
     document.getElementById('vista-lista').style.display='none';
     document.getElementById('vista-mapa').classList.add('visible');
     setTimeout(()=>mapa.invalidateSize(),50);
+  } else {
+    // Desktop: mapa ya visible, solo invalidar tamaño por si acaso
+    setTimeout(()=>mapa.invalidateSize(),50);
   }
 }
 function volverLista(){
-  document.getElementById('vista-lista').style.display='';
-  document.getElementById('vista-mapa').classList.remove('visible');
   document.getElementById('vista-ficha').classList.remove('visible');
+  if(isMob()){
+    // Mobile: mostrar lista, ocultar mapa
+    document.getElementById('vista-lista').style.display='';
+    document.getElementById('vista-mapa').classList.remove('visible');
+  } else {
+    // Desktop: volver a vista inicial — mapa centrado, marcadores sin resaltar
+    document.getElementById('detalle-body').innerHTML='';
+    mks.forEach(mk=>{
+      const cls=mkCls(mk._d.marca);
+      mk.setIcon(L.divIcon({className:'',
+        html:`<div class="mk ${cls}">${mk._d.id}</div>`,
+        iconAnchor:[20,10]}));
+    });
+    // Forzar recálculo de dimensiones antes de mover la vista
+    mapa.invalidateSize({animate:false});
+    setTimeout(()=>{
+      mapa.invalidateSize({animate:false});
+      mapa.setView([-38.95,-68.07], 8);
+    }, 50);
+  }
 }
 
 // ── COPIAR ────────────────────────────────────────────────────────────────────
