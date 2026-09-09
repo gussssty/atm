@@ -395,11 +395,10 @@ function rolCls(rol){
 function crearMk(atm){
   if(!atm.lat||!atm.lon) return null;
   const e   = SIGMA[atm.id];
-  const col = e && e.estado!=='OK' ? colorEstado(e.estado) : null;
-  const cls = col ? '' : mkCls(atm.marca, atm.modelo);
-  const style = col ? `background:${col};border-color:#fff` : '';
+  // Color de fondo según estado SIGMA; si no hay datos, usar gris neutro
+  const bgCol = e ? colorEstado(e.estado) : '#90A4AE';
   const ico=L.divIcon({className:'',
-    html:`<div class="mk ${cls}" style="${style}">${atm.id}</div>`,
+    html:`<div class="mk" style="background:${bgCol};color:#000;border-color:rgba(0,0,0,.25)">${atm.id}</div>`,
     iconAnchor:[20,10]});
   const mk=L.marker([atm.lat,atm.lon],{icon:ico}).on('click',()=>sel(atm));
   mk._d=atm; return mk;
@@ -489,9 +488,10 @@ function volverLista(){
     // Desktop: volver a vista inicial — mapa centrado, marcadores sin resaltar
     document.getElementById('detalle-body').innerHTML='';
     mks.forEach(mk=>{
-      const cls=mkCls(mk._d.marca, mk._d.modelo);
+      const e3  = SIGMA[mk._d.id];
+      const bg3 = e3 ? colorEstado(e3.estado) : '#90A4AE';
       mk.setIcon(L.divIcon({className:'',
-        html:`<div class="mk ${cls}">${mk._d.id}</div>`,
+        html:`<div class="mk" style="background:${bg3};color:#000;border-color:rgba(0,0,0,.25)">${mk._d.id}</div>`,
         iconAnchor:[20,10]}));
     });
     // Forzar recálculo de dimensiones antes de mover la vista
@@ -628,9 +628,11 @@ function sel(atm){
 
   // Resaltar marcador
   mks.forEach(mk=>{
-    const cls=mkCls(mk._d.marca, mk._d.modelo); const activo=mk._d.id===atm.id;
+    const activo = mk._d.id===atm.id;
+    const eH  = SIGMA[mk._d.id];
+    const bgH = eH ? colorEstado(eH.estado) : '#90A4AE';
     mk.setIcon(L.divIcon({className:'',
-      html:`<div class="mk ${cls}" style="${activo?'transform:scale(1.5);z-index:999;box-shadow:0 0 0 3px gold':''}">${mk._d.id}</div>`,
+      html:`<div class="mk" style="background:${bgH};color:#000;border-color:rgba(0,0,0,.25);${activo?'transform:scale(1.5);z-index:999;box-shadow:0 0 0 3px gold':''}">${mk._d.id}</div>`,
       iconAnchor:[20,10]}));
   });
 
@@ -667,8 +669,11 @@ function sel(atm){
 }
 mapa.on('click', ()=>{
   mks.forEach(mk=>{
-    const cls=mkCls(mk._d.marca);
-    mk.setIcon(L.divIcon({className:'',html:`<div class="mk ${cls}">${mk._d.id}</div>`,iconAnchor:[20,10]}));
+    const eC  = SIGMA[mk._d.id];
+    const bgC = eC ? colorEstado(eC.estado) : '#90A4AE';
+    mk.setIcon(L.divIcon({className:'',
+      html:`<div class="mk" style="background:${bgC};color:#000;border-color:rgba(0,0,0,.25)">${mk._d.id}</div>`,
+      iconAnchor:[20,10]}));
   });
 });
 
