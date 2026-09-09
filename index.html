@@ -228,12 +228,9 @@ select{padding:7px 10px;border:1.5px solid #d1d5db;border-radius:8px;
 </header>
 
 <div id="sigma-banner">
-  <span class="sb-item"><span class="sb-dot" style="background:#70AD47"></span><span id="sb-ok">— OK</span></span>
-  <span class="sb-item"><span class="sb-dot" style="background:#FFD966"></span><span id="sb-adv">— Adv.</span></span>
-  <span class="sb-item"><span class="sb-dot" style="background:#FF8C00"></span><span id="sb-ins">— Insumos</span></span>
-  <span class="sb-item"><span class="sb-dot" style="background:#C9513E"></span><span id="sb-nop">— No paga</span></span>
-  <span class="sb-item"><span class="sb-dot" style="background:#FF0000"></span><span id="sb-fds">— F.Servicio</span></span>
-  <span id="sigma-ts">Sin datos</span>
+  <span class="sb-item"><span class="sb-dot" style="background:#43A047"></span><span id="sb-ok">— Operativos</span></span>
+  <span class="sb-item"><span class="sb-dot" style="background:#E53935"></span><span id="sb-fds">— Con problemas</span></span>
+  <span id="sigma-ts">Sin datos de estado</span>
 </div>
 <div id="barra-busqueda">
   <div class="search-row">
@@ -292,6 +289,12 @@ let SIGMA = {};  // {atm_id: {estado, label, color, icono, falla_corta, fecha}}
 
 const ESTADO_ORDER = ['OK','ADVERTENCIA','INSUMOS','NO PAGA','DEPOSITO','FUERA DE SERVICIO'];
 
+function colorEstado(estado){
+  const s = (estado||'').toUpperCase();
+  if(s==='FUERA DE SERVICIO' || s==='NO PAGA') return '#E53935'; // rojo
+  return '#43A047'; // verde para OK, ADVERTENCIA, INSUMOS, DEPOSITO
+}
+
 function cargarEstado(){
   fetch('estado_atms.json?t=' + Date.now())
     .then(r=>{ if(!r.ok) throw new Error('Sin archivo'); return r.json(); })
@@ -300,12 +303,11 @@ function cargarEstado(){
       Object.entries(data.atms).forEach(([id,est])=>{ SIGMA[parseInt(id)]=est; });
       // Actualizar banner
       const res = data.resumen || {};
-      document.getElementById('sb-ok').textContent  = (res['Operativo']||0)+' OK';
-      document.getElementById('sb-adv').textContent = (res['Advertencia']||0)+' Adv.';
-      document.getElementById('sb-ins').textContent = (res['Sin insumos']||0)+' Insumos';
-      document.getElementById('sb-nop').textContent = (res['No dispensa']||0)+' No paga';
-      document.getElementById('sb-fds').textContent = (res['Fuera de servicio']||0)+' F.S.';
-      document.getElementById('sigma-ts').textContent = 'Actualizado: ' + (data.actualizado||'—');
+      const operativos  = (res['Operativo']||0)+(res['Advertencia']||0)+(res['Sin insumos']||0)+(res['Falla depósito']||0);
+      const conProblema = (res['No dispensa']||0)+(res['Fuera de servicio']||0);
+      document.getElementById('sb-ok').textContent  = operativos+' Operativos';
+      document.getElementById('sb-fds').textContent = conProblema+' Con problemas';
+      document.getElementById('sigma-ts').textContent = '⏱ ' + (data.actualizado||'—');
       // Re-renderizar lista y marcadores con colores de estado
       renderLista(filtrados.length ? filtrados : TODOS);
       renderMks(filtrados.length ? filtrados : TODOS);
@@ -320,16 +322,15 @@ function cargarEstado(){
 function estadoBadge(atm_id){
   const e = SIGMA[atm_id];
   if(!e) return '';
-  const bg   = e.color || '#BFBFBF';
+  const col  = colorEstado(e.estado);
   const txt  = e.label || e.estado;
   const falla= e.falla_corta || '';
   const fecha= e.fecha ? e.fecha.slice(0,16) : '';
   return `<div class="estado-wrap">
-    <div class="estado-badge" style="background:${bg}22;color:${bg}">
-      <span class="estado-dot" style="background:${bg}"></span>
-      ${txt}
+    <div class="estado-badge" style="background:${col}22;color:${col}">
+      <span class="estado-dot" style="background:${col}"></span>
+      ${txt}${falla?' — '+falla:''}
     </div>
-    ${falla?`<div class="estado-falla">⚠ ${falla}</div>`:''}
     ${fecha?`<div class="estado-fecha">Desde: ${fecha}</div>`:''}
   </div>`;
 }
@@ -337,7 +338,8 @@ function estadoBadge(atm_id){
 function estadoLiDot(atm_id){
   const e = SIGMA[atm_id];
   if(!e || e.estado==='OK') return '';
-  return `<span class="li-estado" style="background:${e.color}" title="${e.label}"></span>`;
+  const col = colorEstado(e.estado);
+  return `<span class="li-estado" style="background:${col}" title="${e.label}"></span>`;
 }
 
 function mkColorEstado(atm){
@@ -393,7 +395,7 @@ function rolCls(rol){
 function crearMk(atm){
   if(!atm.lat||!atm.lon) return null;
   const e   = SIGMA[atm.id];
-  const col = e && e.estado!=='OK' ? e.color : null;
+  const col = e && e.estado!=='OK' ? colorEstado(e.estado) : null;
   const cls = col ? '' : mkCls(atm.marca, atm.modelo);
   const style = col ? `background:${col};border-color:#fff` : '';
   const ico=L.divIcon({className:'',
