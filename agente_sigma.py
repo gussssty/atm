@@ -1,6 +1,6 @@
 """
 agente_sigma.py — Descarga el estado de terminales desde SIGMA Red Link
-y genera estado_atms.json para la app ATMs BPN.
+usando Selenium (navegador headless) para manejar la sesión correctamente.
 
 Corre automáticamente via GitHub Actions cada hora.
 Las credenciales vienen de variables de entorno (GitHub Secrets).
@@ -10,20 +10,21 @@ import os
 import io
 import json
 import time
-import requests
 import pandas as pd
 from datetime import datetime
-from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 # ── Credenciales desde GitHub Secrets ────────────────────────────────────────
 SIGMA_USER     = os.environ.get('SIGMA_USER', '')
 SIGMA_PASSWORD = os.environ.get('SIGMA_PASSWORD', '')
 
 # ── URLs SIGMA ────────────────────────────────────────────────────────────────
-BASE_URL     = 'https://sigma.redlink.com.ar'
-URL_LOGIN    = f'{BASE_URL}/monitorhw/pages/login.xhtml'
-URL_MONITOR  = f'{BASE_URL}/monitorhw/pages/vistaPorTerminal.xhtml'
-URL_HOME     = f'{BASE_URL}/monitorhw/pages/home.xhtml'
+URL_LOGIN   = 'https://sigma.redlink.com.ar/monitorhw/pages/login.xhtml'
+URL_MONITOR = 'https://sigma.redlink.com.ar/monitorhw/redlink/pages/vistaPorTerminal.xhtml'
 
 # ── Paleta de estados ─────────────────────────────────────────────────────────
 ESTADO_CONFIG = {
@@ -38,363 +39,279 @@ ESTADO_CONFIG = {
 
 DIAS = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo']
 
-def get_viewstate(html_text):
-    """Extrae el ViewState de JSF de una página."""
-    soup = BeautifulSoup(html_text, 'html.parser')
-    vs = soup.find('input', {'name': 'javax.faces.ViewState'})
-    return vs['value'] if vs else ''
+def crear_driver():
+    """Crea un navegador Chrome headless."""
+    opts = Options()
+    opts.add_argument('--headless')
+    opts.add_argument('--no-sandbox')
+    opts.add_argument('--disable-dev-shm-usage')
+    opts.add_argument('--disable-gpu')
+    opts.add_argument('--window-size=1920,1080')
+    opts.add_argument('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36')
+    opts.add_experimental_option('prefs', {
+        'download.default_directory': os.path.abspath('.'),
+        'download.prompt_for_download': False,
+        'download.directory_upgrade': True,
+    })
+    driver = webdriver.Chrome(options=opts)
+    driver.set_page_load_timeout(30)
+    return driver
 
-def get_form_id(html_text):
-    """Extrae el ID del formulario principal."""
-    soup = BeautifulSoup(html_text, 'html.parser')
-    form = soup.find('form')
-    return form.get('id', '') if form else ''
-
-def login(session):
-    """Hace login en SIGMA. Devuelve True si fue exitoso."""
+def login(driver):
+    """Hace login en SIGMA con Selenium."""
     print('🔐 Iniciando sesión en SIGMA...')
+    driver.get(URL_LOGIN)
+    wait = WebDriverWait(driver, 15)
 
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        'Accept-Language': 'es-AR,es;q=0.9',
-    }
-    session.headers.update(headers)
+    print(f'  URL login: {driver.current_url}')
 
-    # GET login page
+    # Esperar que cargue el formulario
     try:
-        resp = session.get(URL_LOGIN, timeout=30)
-        resp.raise_for_status()
-    except Exception as e:
-        # Intentar URL alternativa
-        try:
-            resp = session.get(f'{BASE_URL}/portal/pages/login.xhtml', timeout=30)
-            resp.raise_for_status()
-        except Exception as e2:
-            print(f'  ✗ No se pudo acceder al login: {e2}')
+        # Buscar campo usuario
+        user_field = None
+        for selector in ['input[type="text"]', 'input[name*="usuario"]',
+                         'input[name*="user"]', 'input[id*="usuario"]']:
+            try:
+                user_field = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, selector)))
+                if user_field.is_displayed():
+                    break
+            except: pass
+
+        if not user_field:
+            print('  ✗ No se encontró el campo de usuario')
+            driver.save_screenshot('sigma_debug.png')
+            with open('sigma_debug.html','w',encoding='utf-8',errors='replace') as f:
+                f.write(driver.page_source)
             return False
 
-    viewstate = get_viewstate(resp.text)
-    form_id   = get_form_id(resp.text)
+        # Buscar campo contraseña
+        pass_field = None
+        for selector in ['input[type="password"]', 'input[name*="password"]',
+                         'input[name*="clave"]', 'input[id*="password"]']:
+            try:
+                pass_field = driver.find_element(By.CSS_SELECTOR, selector)
+                if pass_field.is_displayed():
+                    break
+            except: pass
 
-    # Detectar campos del formulario
-    soup = BeautifulSoup(resp.text, 'html.parser')
-    inputs = {inp.get('name',''): inp.get('value','') for inp in soup.find_all('input')}
+        if not pass_field:
+            print('  ✗ No se encontró el campo de contraseña')
+            return False
 
-    # Construir payload de login
-    payload = {}
-    for name, val in inputs.items():
-        payload[name] = val
+        # Completar formulario
+        user_field.clear()
+        user_field.send_keys(SIGMA_USER)
+        pass_field.clear()
+        pass_field.send_keys(SIGMA_PASSWORD)
 
-    # Buscar campos de usuario y contraseña
-    user_field = next((n for n in inputs if 'usuario' in n.lower() or 'user' in n.lower() or 'login' in n.lower()), None)
-    pass_field = next((n for n in inputs if 'password' in n.lower() or 'clave' in n.lower() or 'pass' in n.lower()), None)
+        # Buscar y clickear botón de login
+        btn = None
+        for selector in ['input[type="submit"]', 'button[type="submit"]',
+                         'input[value*="ngresar"]', 'button']:
+            try:
+                btn = driver.find_element(By.CSS_SELECTOR, selector)
+                if btn.is_displayed():
+                    break
+            except: pass
 
-    if user_field:
-        payload[user_field] = SIGMA_USER
-    if pass_field:
-        payload[pass_field] = SIGMA_PASSWORD
+        if btn:
+            btn.click()
+        else:
+            pass_field.submit()
 
-    # Buscar botón de submit
-    btn = soup.find('input', {'type': 'submit'}) or soup.find('button', {'type': 'submit'})
-    if btn and btn.get('name'):
-        payload[btn['name']] = btn.get('value', 'Ingresar')
+        # Esperar navegación
+        time.sleep(3)
+        print(f'  URL post-login: {driver.current_url}')
 
-    payload['javax.faces.ViewState'] = viewstate
-    if form_id:
-        payload[form_id] = form_id
+        if 'login' in driver.current_url.lower():
+            # Verificar si es error de credenciales
+            page = driver.page_source.lower()
+            if any(x in page for x in ['incorrecto','invalido','error','invalid']):
+                print('  ✗ Login fallido — credenciales incorrectas')
+                return False
+            print('  ⚠ Sigue en login, esperando...')
+            time.sleep(3)
 
-    # Asegurar HTTPS en la URL de destino del POST
-    post_url = resp.url
-    if post_url.startswith('http://'):
-        post_url = 'https://' + post_url[7:]
-    print(f'  Enviando credenciales a {post_url[:60]}...')
-    resp2 = session.post(post_url, data=payload, timeout=30, allow_redirects=True)
+        print(f'  ✓ Login OK — URL: {driver.current_url}')
+        return True
 
-    # Verificar éxito - SIGMA puede redirigir a varias URLs post-login
-    final_url = resp2.url
-    print(f'  URL final tras login: {final_url}')
-
-    # Si sigue en login con error, falló
-    if 'login' in final_url.lower() and ('error' in resp2.text.lower() or 'incorrecto' in resp2.text.lower() or 'invalido' in resp2.text.lower()):
-        print('  ✗ Login fallido — credenciales incorrectas')
+    except Exception as e:
+        print(f'  ✗ Error en login: {e}')
+        with open('sigma_debug.html','w',encoding='utf-8',errors='replace') as f:
+            f.write(driver.page_source)
         return False
 
-    # SIGMA a veces redirige a una página intermedia - seguir navegando al home
-    if 'login' in final_url.lower():
-        print('  Sesión iniciada, navegando al home...')
-        # Intentar navegar directo al monitor
-        for url_intento in [
-            'https://sigma.redlink.com.ar/monitorhw/pages/vistaPorTerminal.xhtml',
-            'https://sigma.redlink.com.ar/monitorhw/redlink/pages/vistaPorTerminal.xhtml',
-            'https://sigma.redlink.com.ar/monitorhw/pages/home.xhtml',
-            'https://sigma.redlink.com.ar/monitorhw/redlink/pages/home.xhtml',
-        ]:
-            r = session.get(url_intento, timeout=30)
-            if 'login' not in r.url.lower():
-                print(f'  ✓ Navegación exitosa a: {r.url}')
-                return True
-            print(f'  Redirigido a login desde: {url_intento}')
-
-        # Guardar HTML para diagnóstico
-        with open('sigma_debug.html','w',encoding='utf-8',errors='replace') as f:
-            f.write(resp2.text)
-        print('  ⚠ Sesión posiblemente activa pero con redirección - continuando...')
-        return True  # Intentar de todos modos
-
-    print(f'  ✓ Login exitoso ({final_url})')
-    return True
-
-def descargar_excel(session):
-    """Navega a Monitor de Hardware y descarga el Excel."""
+def descargar_excel(driver):
+    """Navega al monitor y descarga el Excel."""
     print('📥 Accediendo a Monitor de Hardware...')
 
-    # Probar varias URLs posibles del monitor de SIGMA
-    resp = None
-    urls_monitor = [
-        URL_MONITOR,
-        'https://sigma.redlink.com.ar/monitorhw/redlink/pages/vistaPorTerminal.xhtml',
-        'https://sigma.redlink.com.ar/monitorhw/pages/monitorHW.xhtml',
-        'https://sigma.redlink.com.ar/monitorhw/redlink/pages/monitorHW.xhtml',
-    ]
-    for url_m in urls_monitor:
-        try:
-            r = session.get(url_m, timeout=30)
-            if 'login' not in r.url.lower() and len(r.content) > 1000:
-                resp = r
-                print(f'  ✓ Monitor encontrado en: {r.url}')
-                break
-            else:
-                print(f'  Redirigió a login desde: {url_m}')
-        except Exception as e:
-            print(f'  Error en {url_m}: {e}')
+    driver.get(URL_MONITOR)
+    time.sleep(3)
+    print(f'  URL monitor: {driver.current_url}')
 
-    if resp is None:
-        print('  ✗ No se pudo acceder al monitor en ninguna URL')
+    if 'login' in driver.current_url.lower():
+        print('  ✗ Redirigido al login — sesión no válida')
+        with open('sigma_debug.html','w',encoding='utf-8',errors='replace') as f:
+            f.write(driver.page_source)
         return None
 
-    soup = BeautifulSoup(resp.text, 'html.parser')
-    viewstate = get_viewstate(resp.text)
-    form_id   = get_form_id(resp.text)
+    # Guardar HTML del monitor para diagnóstico
+    with open('sigma_monitor.html','w',encoding='utf-8',errors='replace') as f:
+        f.write(driver.page_source)
+    print('  sigma_monitor.html guardado')
 
-    # Buscar botón/link de exportar Excel
+    # Buscar botón de exportar Excel
     export_btn = None
-    for tag in soup.find_all(['input', 'button', 'a', 'span']):
-        txt = (tag.get_text(strip=True) + tag.get('value','') + tag.get('title','')).lower()
-        if any(x in txt for x in ['excel', 'xls', 'export', 'descargar', 'exportar']):
-            export_btn = tag
-            print(f'  Botón export encontrado: {tag.get("id","?")} — "{tag.get_text(strip=True)}"')
-            break
-
-    if export_btn:
-        # Si es un link directo
-        href = export_btn.get('href', '')
-        if href and href not in ('#', 'javascript:void(0)', ''):
-            url_export = href if href.startswith('http') else BASE_URL + href
-            r = session.get(url_export, timeout=30)
-            ct = r.headers.get('Content-Type', '')
-            if 'application' in ct or 'excel' in ct or len(r.content) > 3000:
-                print(f'  ✓ Excel descargado via GET ({len(r.content)//1024} KB)')
-                return r.content
-
-        # Si es un botón POST (JSF)
-        btn_id   = export_btn.get('id') or export_btn.get('name', '')
-        btn_name = export_btn.get('name') or btn_id
-
-        payload = {
-            form_id: form_id,
-            'javax.faces.ViewState': viewstate,
-        }
-        if btn_name:
-            payload[btn_name] = export_btn.get('value', '')
-
-        # JSF partial request para trigger del botón
-        payload['javax.faces.partial.ajax']   = 'true'
-        payload['javax.faces.partial.execute'] = '@all'
-        payload['javax.faces.partial.render']  = '@all'
-        payload['javax.faces.source']          = btn_id
-
-        r = session.post(resp.url, data=payload, timeout=30)
-        ct = r.headers.get('Content-Type', '')
-
-        if 'application' in ct or 'excel' in ct or (len(r.content) > 3000 and b'<html' not in r.content[:100].lower()):
-            print(f'  ✓ Excel descargado via POST JSF ({len(r.content)//1024} KB)')
-            return r.content
-
-        # Buscar redirect a archivo en la respuesta
-        if b'window.location' in r.content or b'redirect' in r.content.lower():
-            soup2 = BeautifulSoup(r.text, 'html.parser')
-            for sc in soup2.find_all('script'):
-                if 'location' in sc.text:
-                    import re
-                    match = re.search(r"location['\s]*=\s*['\"]([^'\"]+)['\"]", sc.text)
-                    if match:
-                        url2 = match.group(1)
-                        if not url2.startswith('http'):
-                            url2 = BASE_URL + url2
-                        r2 = session.get(url2, timeout=30)
-                        if len(r2.content) > 3000:
-                            print(f'  ✓ Excel descargado via redirect ({len(r2.content)//1024} KB)')
-                            return r2.content
-
-    # Intentar URL directa conocida de SIGMA
-    urls_intento = [
-        f'{BASE_URL}/monitorhw/pages/vistaPorTerminal.xhtml?export=xls',
-        f'{BASE_URL}/monitorhw/exportarTerminales.xhtml',
-        f'{BASE_URL}/monitorhw/pages/exportarTerminales.xhtml',
-    ]
-    for url in urls_intento:
+    for selector in [
+        'input[value*="xcel"]', 'input[value*="Excel"]',
+        'button[value*="xcel"]', 'button[value*="Excel"]',
+        'a[href*="xcel"]', 'a[href*="export"]',
+        'input[id*="export"]', 'button[id*="export"]',
+        'input[title*="Excel"]', 'span[title*="Excel"]',
+    ]:
         try:
-            r = session.get(url, timeout=30)
-            ct = r.headers.get('Content-Type', '')
-            if 'application' in ct or 'excel' in ct or (len(r.content) > 3000 and b'<html' not in r.content[:200].lower()):
-                print(f'  ✓ Excel descargado desde {url} ({len(r.content)//1024} KB)')
-                return r.content
-        except:
-            pass
+            btns = driver.find_elements(By.CSS_SELECTOR, selector)
+            for b in btns:
+                if b.is_displayed():
+                    export_btn = b
+                    print(f'  Botón export: {b.tag_name} id={b.get_attribute("id")} val={b.get_attribute("value")} txt={b.text[:30]}')
+                    break
+            if export_btn: break
+        except: pass
 
-    print('  ✗ No se pudo descargar el Excel automáticamente')
-    with open('sigma_debug.html', 'w', encoding='utf-8', errors='replace') as f:
-        f.write(f'<!-- URL: {resp.url} -->\n')
-        f.write(f'<!-- Botones encontrados: {[t.get("id","") for t in soup.find_all(["input","button","a"])[:20]]} -->\n')
-        f.write(resp.text)
-    print('  → sigma_debug.html guardado para diagnóstico')
+    # Si no encontró por selector, buscar por texto
+    if not export_btn:
+        for tag in ['input','button','a','span']:
+            try:
+                elems = driver.find_elements(By.TAG_NAME, tag)
+                for e in elems:
+                    txt = (e.text + e.get_attribute('value') or '' + e.get_attribute('title') or '').lower()
+                    if any(x in txt for x in ['excel','xls','export','exportar','descargar']):
+                        if e.is_displayed():
+                            export_btn = e
+                            print(f'  Botón export por texto: {e.tag_name} — "{e.text or e.get_attribute("value")}"')
+                            break
+                if export_btn: break
+            except: pass
+
+    if not export_btn:
+        print('  ✗ No se encontró botón de exportar')
+        print('  Elementos visibles en página:')
+        for tag in ['input','button','a']:
+            elems = driver.find_elements(By.TAG_NAME, tag)
+            for e in elems[:5]:
+                if e.is_displayed():
+                    print(f'    {e.tag_name}: id={e.get_attribute("id")} val={e.get_attribute("value")} txt={e.text[:30]}')
+        return None
+
+    # Configurar directorio de descarga y clickear
+    download_dir = os.path.abspath('.')
+    print(f'  Descargando en: {download_dir}')
+    export_btn.click()
+    
+    # Esperar que aparezca el archivo descargado
+    print('  Esperando descarga...')
+    for i in range(15):
+        time.sleep(2)
+        archivos = [f for f in os.listdir(download_dir) 
+                    if f.endswith(('.xls','.xlsx','.csv')) and 'estado_atms' not in f]
+        if archivos:
+            archivo = max(archivos, key=lambda f: os.path.getmtime(os.path.join(download_dir, f)))
+            ruta = os.path.join(download_dir, archivo)
+            print(f'  ✓ Descargado: {archivo} ({os.path.getsize(ruta)//1024} KB)')
+            with open(ruta,'rb') as f:
+                return f.read(), archivo
+        print(f'  Esperando... ({(i+1)*2}s)')
+
+    print('  ✗ Timeout esperando descarga')
     return None
 
-def procesar_excel(contenido):
-    """Procesa el archivo descargado de SIGMA (Excel o HTML) y devuelve dict con estado por ATM."""
-    if not isinstance(contenido, bytes):
-        with open(contenido, 'rb') as f:
-            contenido = f.read()
+def procesar_excel(contenido, nombre_archivo=''):
+    """Procesa el archivo descargado."""
+    if isinstance(contenido, tuple):
+        contenido, nombre_archivo = contenido
 
-    # Detectar formato real por los primeros bytes
-    inicio = contenido[:20].strip()
-    print(f'  Primeros bytes: {contenido[:60]}')
+    if isinstance(contenido, bytes):
+        data = io.BytesIO(contenido)
+    else:
+        data = contenido
+
+    # Detectar formato
+    inicio = contenido[:50] if isinstance(contenido, bytes) else b''
+    print(f'  Formato detectado por primeros bytes: {inicio[:20]}')
 
     df = None
-
-    # 1. Intentar como HTML (SIGMA suele devolver HTML con extensión .xls)
-    if inicio.startswith(b'<') or b'<html' in contenido[:500].lower() or b'<table' in contenido[:500].lower():
-        print('  Formato detectado: HTML')
-        try:
-            tablas = pd.read_html(io.BytesIO(contenido), encoding='utf-8')
-            if not tablas:
-                tablas = pd.read_html(io.BytesIO(contenido), encoding='latin1')
-            # Buscar la tabla que tenga columna Terminal
-            for tabla in tablas:
-                cols = [str(c).lower() for c in tabla.columns]
-                if any('terminal' in c for c in cols):
-                    df = tabla
-                    # Renombrar columnas si están en minúsculas
-                    df.columns = [str(c).strip() for c in df.columns]
-                    print(f'  Tabla encontrada: {len(df)} filas, cols: {list(df.columns)[:6]}')
-                    break
-            if df is None and tablas:
-                df = tablas[0]
-                print(f'  Usando primera tabla: {len(df)} filas')
-        except Exception as e:
-            print(f'  Error parseando HTML: {e}')
-
-    # 2. Intentar como XLS binario
+    # HTML disfrazado de Excel
+    if b'<' in inicio or b'html' in inicio.lower():
+        print('  Parseando como HTML...')
+        tablas = pd.read_html(data, encoding='latin1')
+        for t in tablas:
+            cols = [str(c).lower() for c in t.columns]
+            if any('terminal' in c for c in cols):
+                df = t
+                break
+        if df is None and tablas:
+            df = tablas[0]
+    
     if df is None:
-        print('  Intentando como XLS binario...')
-        try:
-            df = pd.read_excel(io.BytesIO(contenido), header=0, engine='xlrd')
-        except Exception as e:
-            print(f'  XLS falló: {e}')
-
-    # 3. Intentar como XLSX
-    if df is None:
-        print('  Intentando como XLSX...')
-        try:
-            df = pd.read_excel(io.BytesIO(contenido), header=0, engine='openpyxl')
-        except Exception as e:
-            print(f'  XLSX falló: {e}')
-
-    # 4. Intentar como CSV
-    if df is None:
-        print('  Intentando como CSV...')
-        try:
-            import csv as csv_mod
-            for sep in [';', ',', '\t']:
-                try:
-                    df = pd.read_csv(io.BytesIO(contenido), sep=sep, encoding='latin1')
-                    if len(df.columns) > 3:
-                        print(f'  CSV con sep={sep!r}: {len(df)} filas')
-                        break
-                except: pass
-        except Exception as e:
-            print(f'  CSV falló: {e}')
+        for engine in ['xlrd', 'openpyxl']:
+            try:
+                if isinstance(data, io.BytesIO): data.seek(0)
+                df = pd.read_excel(data, header=0, engine=engine)
+                print(f'  Parseado como Excel ({engine})')
+                break
+            except: pass
 
     if df is None:
-        # Guardar para diagnóstico
-        with open('sigma_raw_download', 'wb') as f:
-            f.write(contenido)
-        raise ValueError('No se pudo parsear el archivo descargado de SIGMA. Guardado como sigma_raw_download para diagnóstico.')
+        raise ValueError('No se pudo parsear el archivo')
 
-    print(f'  📊 {len(df)} terminales | Estados: {df["Estado Fisico"].value_counts().to_dict()}')
+    print(f'  📊 {len(df)} filas | Columnas: {list(df.columns)[:6]}')
 
     estado_atms = {}
     for _, row in df.iterrows():
-        terminal = str(row.get('Terminal', '')).strip().lstrip('0')
-        if not terminal: continue
+        terminal = str(row.get('Terminal', row.iloc[0] if len(row) > 0 else '')).strip().lstrip('0')
+        if not terminal or not terminal.isdigit(): continue
         try: atm_id = int(terminal)
         except: continue
 
-        estado_raw  = str(row.get('Estado Fisico', '')).strip().upper()
-        falla       = str(row.get('FallaPrincipal', '')).strip()
-        fecha       = str(row.get('Fecha Fisico', '')).strip()
-        conectiv    = str(row.get('Conectividad', '')).strip()
-        carga       = str(row.get('Estado Carga', '')).strip()
-
+        estado_raw  = str(row.get('Estado Fisico', row.get('Estado Físico',''))).strip().upper()
+        falla       = str(row.get('FallaPrincipal', row.get('Falla Principal',''))).strip()
+        fecha       = str(row.get('Fecha Fisico', row.get('Fecha Físico',''))).strip()
         cfg         = ESTADO_CONFIG.get(estado_raw, ESTADO_CONFIG['SIN DATOS'])
         falla_corta = falla.split(' - ')[-1].strip() if ' - ' in falla else falla
         falla_cat   = falla.split(' - ')[0].strip()  if ' - ' in falla else ''
 
         estado_atms[atm_id] = {
-            'estado':      estado_raw,
-            'label':       cfg['label'],
-            'color':       cfg['color'],
-            'icono':       cfg['icono'],
-            'falla':       falla,
-            'falla_corta': falla_corta,
-            'falla_cat':   falla_cat,
-            'fecha':       fecha[:16] if len(fecha) >= 16 else fecha,
-            'conectiv':    conectiv,
-            'carga':       carga,
+            'estado': estado_raw, 'label': cfg['label'], 'color': cfg['color'],
+            'icono': cfg['icono'], 'falla': falla, 'falla_corta': falla_corta,
+            'falla_cat': falla_cat,
+            'fecha': fecha[:16] if len(fecha) >= 16 else fecha,
+            'conectiv': str(row.get('Conectividad','')).strip(),
+            'carga':    str(row.get('Estado Carga','')).strip(),
         }
     return estado_atms
 
 def generar_json(estado_atms, ruta='estado_atms.json'):
-    """Guarda el JSON con timestamp de ejecución."""
     ahora_dt = datetime.now()
     ahora    = f"{DIAS[ahora_dt.weekday()]} {ahora_dt.strftime('%d/%m/%Y %H:%M')}hs"
-
-    resumen = {}
+    resumen  = {}
     for cfg in ESTADO_CONFIG.values():
         count = sum(1 for v in estado_atms.values() if v['label'] == cfg['label'])
         if count: resumen[cfg['label']] = count
 
-    output = {
-        'actualizado': ahora,
-        'total':       len(estado_atms),
-        'resumen':     resumen,
-        'atms':        {str(k): v for k, v in estado_atms.items()},
-    }
+    output = {'actualizado': ahora, 'total': len(estado_atms),
+               'resumen': resumen, 'atms': {str(k): v for k,v in estado_atms.items()}}
 
     with open(ruta, 'w', encoding='utf-8') as f:
         json.dump(output, f, ensure_ascii=False, indent=2)
 
     print(f'\n✓ {ruta} generado — {ahora}')
-    print(f'  Total: {len(estado_atms)} ATMs')
     for label, count in sorted(resumen.items(), key=lambda x: -x[1]):
         iconos = {'Operativo':'✓','Advertencia':'⚠','Sin insumos':'📦',
                   'No dispensa':'💸','Falla depósito':'🏦','Fuera de servicio':'✗'}
         print(f'  {iconos.get(label,"•")} {label:<22} {count}')
-
     return output
 
-# ── MAIN ─────────────────────────────────────────────────────────────────────
 def main():
     sep = '=' * 56
     print(f'\n{sep}')
@@ -403,52 +320,30 @@ def main():
     print(f'{sep}\n')
 
     if not SIGMA_USER or not SIGMA_PASSWORD:
-        print('✗ Credenciales no configuradas.')
-        print('  Configurá SIGMA_USER y SIGMA_PASSWORD en GitHub Secrets.')
+        print('✗ Configurá SIGMA_USER y SIGMA_PASSWORD en GitHub Secrets.')
         exit(1)
 
-    session = requests.Session()
+    driver = crear_driver()
+    try:
+        if not login(driver):
+            exit(1)
 
-    # Forzar HTTPS en todos los redirects — SIGMA a veces redirige a HTTP
-    from requests import PreparedRequest
-    from requests.adapters import HTTPAdapter
+        resultado = descargar_excel(driver)
+        if not resultado:
+            exit(1)
 
-    class ForceHTTPS(HTTPAdapter):
-        def send(self, request, *args, **kwargs):
-            if request.url.startswith('http://'):
-                request.url = 'https://' + request.url[7:]
-                print(f'  [HTTPS forzado] → {request.url[:60]}')
-            return super().send(request, *args, **kwargs)
+        estado_atms = procesar_excel(resultado)
+        if not estado_atms:
+            print('✗ Sin datos válidos.')
+            exit(1)
 
-    session.mount('http://',  ForceHTTPS())
-    session.mount('https://', ForceHTTPS())
+        generar_json(estado_atms)
+        print(f'\n{sep}')
+        print('  ✅  COMPLETADO')
+        print(f'{sep}\n')
 
-    # Login
-    if not login(session):
-        exit(1)
-
-    # Descargar Excel
-    print('\n📥 Descargando datos...')
-    contenido = descargar_excel(session)
-
-    if not contenido:
-        print('\n✗ No se pudo obtener el Excel de SIGMA.')
-        exit(1)
-
-    # Procesar
-    print('\n⚙️  Procesando...')
-    estado_atms = procesar_excel(contenido)
-
-    if not estado_atms:
-        print('✗ No se obtuvieron datos válidos del Excel.')
-        exit(1)
-
-    # Guardar JSON
-    generar_json(estado_atms)
-
-    print(f'\n{sep}')
-    print('  ✅  COMPLETADO — estado_atms.json listo para subir')
-    print(f'{sep}\n')
+    finally:
+        driver.quit()
 
 if __name__ == '__main__':
     main()
