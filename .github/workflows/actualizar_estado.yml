@@ -27,6 +27,14 @@ jobs:
           SIGMA_PASSWORD: ${{ secrets.SIGMA_PASSWORD }}
         run: python agente_sigma.py
 
+      - name: Subir debug HTML si falló
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sigma-debug
+          path: sigma_debug.html
+          if-no-files-found: ignore
+
       - name: Subir estado_atms.json al repo
         run: |
           git config user.name  "github-actions[bot]"
