@@ -18,8 +18,15 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Instalar dependencias
-        run: pip install requests beautifulsoup4 pandas xlrd openpyxl lxml html5lib
+      - name: Instalar Chrome
+        run: |
+          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+          echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
+          sudo apt-get update -q
+          sudo apt-get install -y google-chrome-stable
+
+      - name: Instalar dependencias Python
+        run: pip install selenium pandas xlrd openpyxl webdriver-manager
 
       - name: Descargar estado de SIGMA y generar JSON
         env:
