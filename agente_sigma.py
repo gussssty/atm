@@ -63,12 +63,12 @@ def login(session):
 
     # GET login page
     try:
-        resp = session.get(URL_LOGIN, timeout=20)
+        resp = session.get(URL_LOGIN, timeout=30)
         resp.raise_for_status()
     except Exception as e:
         # Intentar URL alternativa
         try:
-            resp = session.get(f'{BASE_URL}/portal/pages/login.xhtml', timeout=20)
+            resp = session.get(f'{BASE_URL}/portal/pages/login.xhtml', timeout=30)
             resp.raise_for_status()
         except Exception as e2:
             print(f'  ✗ No se pudo acceder al login: {e2}')
@@ -104,8 +104,12 @@ def login(session):
     if form_id:
         payload[form_id] = form_id
 
-    print(f'  Enviando credenciales...')
-    resp2 = session.post(resp.url, data=payload, timeout=20, allow_redirects=True)
+    # Asegurar HTTPS en la URL de destino del POST
+    post_url = resp.url
+    if post_url.startswith('http://'):
+        post_url = 'https://' + post_url[7:]
+    print(f'  Enviando credenciales a {post_url[:60]}...')
+    resp2 = session.post(post_url, data=payload, timeout=30, allow_redirects=True)
 
     # Verificar éxito
     if 'login' in resp2.url.lower() and 'error' in resp2.text.lower():
@@ -120,7 +124,7 @@ def descargar_excel(session):
     print('📥 Accediendo a Monitor de Hardware...')
 
     try:
-        resp = session.get(URL_MONITOR, timeout=20)
+        resp = session.get(URL_MONITOR, timeout=30)
         resp.raise_for_status()
     except Exception as e:
         print(f'  ✗ No se pudo acceder al monitor: {e}')
@@ -198,7 +202,7 @@ def descargar_excel(session):
     ]
     for url in urls_intento:
         try:
-            r = session.get(url, timeout=20)
+            r = session.get(url, timeout=30)
             ct = r.headers.get('Content-Type', '')
             if 'application' in ct or 'excel' in ct or (len(r.content) > 3000 and b'<html' not in r.content[:200].lower()):
                 print(f'  ✓ Excel descargado desde {url} ({len(r.content)//1024} KB)')
@@ -360,6 +364,20 @@ def main():
         exit(1)
 
     session = requests.Session()
+
+    # Forzar HTTPS en todos los redirects — SIGMA a veces redirige a HTTP
+    from requests import PreparedRequest
+    from requests.adapters import HTTPAdapter
+
+    class ForceHTTPS(HTTPAdapter):
+        def send(self, request, *args, **kwargs):
+            if request.url.startswith('http://'):
+                request.url = 'https://' + request.url[7:]
+                print(f'  [HTTPS forzado] → {request.url[:60]}')
+            return super().send(request, *args, **kwargs)
+
+    session.mount('http://',  ForceHTTPS())
+    session.mount('https://', ForceHTTPS())
 
     # Login
     if not login(session):
