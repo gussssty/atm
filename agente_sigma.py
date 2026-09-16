@@ -111,23 +111,66 @@ def login(session):
     print(f'  Enviando credenciales a {post_url[:60]}...')
     resp2 = session.post(post_url, data=payload, timeout=30, allow_redirects=True)
 
-    # Verificar éxito
-    if 'login' in resp2.url.lower() and 'error' in resp2.text.lower():
-        print('  ✗ Login fallido — verificá las credenciales en GitHub Secrets')
+    # Verificar éxito - SIGMA puede redirigir a varias URLs post-login
+    final_url = resp2.url
+    print(f'  URL final tras login: {final_url}')
+
+    # Si sigue en login con error, falló
+    if 'login' in final_url.lower() and ('error' in resp2.text.lower() or 'incorrecto' in resp2.text.lower() or 'invalido' in resp2.text.lower()):
+        print('  ✗ Login fallido — credenciales incorrectas')
         return False
 
-    print(f'  ✓ Login exitoso ({resp2.url})')
+    # SIGMA a veces redirige a una página intermedia - seguir navegando al home
+    if 'login' in final_url.lower():
+        print('  Sesión iniciada, navegando al home...')
+        # Intentar navegar directo al monitor
+        for url_intento in [
+            'https://sigma.redlink.com.ar/monitorhw/pages/vistaPorTerminal.xhtml',
+            'https://sigma.redlink.com.ar/monitorhw/redlink/pages/vistaPorTerminal.xhtml',
+            'https://sigma.redlink.com.ar/monitorhw/pages/home.xhtml',
+            'https://sigma.redlink.com.ar/monitorhw/redlink/pages/home.xhtml',
+        ]:
+            r = session.get(url_intento, timeout=30)
+            if 'login' not in r.url.lower():
+                print(f'  ✓ Navegación exitosa a: {r.url}')
+                return True
+            print(f'  Redirigido a login desde: {url_intento}')
+
+        # Guardar HTML para diagnóstico
+        with open('sigma_debug.html','w',encoding='utf-8',errors='replace') as f:
+            f.write(resp2.text)
+        print('  ⚠ Sesión posiblemente activa pero con redirección - continuando...')
+        return True  # Intentar de todos modos
+
+    print(f'  ✓ Login exitoso ({final_url})')
     return True
 
 def descargar_excel(session):
     """Navega a Monitor de Hardware y descarga el Excel."""
     print('📥 Accediendo a Monitor de Hardware...')
 
-    try:
-        resp = session.get(URL_MONITOR, timeout=30)
-        resp.raise_for_status()
-    except Exception as e:
-        print(f'  ✗ No se pudo acceder al monitor: {e}')
+    # Probar varias URLs posibles del monitor de SIGMA
+    resp = None
+    urls_monitor = [
+        URL_MONITOR,
+        'https://sigma.redlink.com.ar/monitorhw/redlink/pages/vistaPorTerminal.xhtml',
+        'https://sigma.redlink.com.ar/monitorhw/pages/monitorHW.xhtml',
+        'https://sigma.redlink.com.ar/monitorhw/redlink/pages/monitorHW.xhtml',
+    ]
+    for url_m in urls_monitor:
+        try:
+            r = session.get(url_m, timeout=30)
+            if 'login' not in r.url.lower() and len(r.content) > 1000:
+                resp = r
+                print(f'  ✓ Monitor encontrado en: {r.url}')
+                break
+            else:
+                print(f'  Redirigió a login desde: {url_m}')
+        except Exception as e:
+            print(f'  Error en {url_m}: {e}')
+
+    if resp is None:
+        print('  ✗ No se pudo acceder al monitor en ninguna URL')
         return None
 
     soup = BeautifulSoup(resp.text, 'html.parser')
@@ -211,10 +254,11 @@ def descargar_excel(session):
             pass
 
     print('  ✗ No se pudo descargar el Excel automáticamente')
-    print('  → Guardá el HTML de la página para diagnóstico')
-    with open('sigma_debug.html', 'w', encoding='utf-8') as f:
+    with open('sigma_debug.html', 'w', encoding='utf-8', errors='replace') as f:
+        f.write(f'<!-- URL: {resp.url} -->\n')
+        f.write(f'<!-- Botones encontrados: {[t.get("id","") for t in soup.find_all(["input","button","a"])[:20]]} -->\n')
         f.write(resp.text)
-    print('  → Guardado: sigma_debug.html')
+    print('  → sigma_debug.html guardado para diagnóstico')
     return None
 
 def procesar_excel(contenido):
