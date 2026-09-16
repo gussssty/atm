@@ -19,7 +19,7 @@ jobs:
           python-version: '3.12'
 
       - name: Instalar dependencias
-        run: pip install requests beautifulsoup4 pandas xlrd
+        run: pip install requests beautifulsoup4 pandas xlrd openpyxl lxml html5lib
 
       - name: Descargar estado de SIGMA y generar JSON
         env:
