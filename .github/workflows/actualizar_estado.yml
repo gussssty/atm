@@ -1,0 +1,36 @@
+name: Actualizar Estado ATMs
+
+on:
+  schedule:
+    - cron: '0 * * * *'   # cada hora en punto
+  workflow_dispatch:        # también permite correrlo manualmente desde GitHub
+
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v4
+
+      - name: Instalar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Instalar dependencias
+        run: pip install requests beautifulsoup4 pandas xlrd
+
+      - name: Descargar estado de SIGMA y generar JSON
+        env:
+          SIGMA_USER:     ${{ secrets.SIGMA_USER }}
+          SIGMA_PASSWORD: ${{ secrets.SIGMA_PASSWORD }}
+        run: python agente_sigma.py
+
+      - name: Subir estado_atms.json al repo
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add estado_atms.json
+          git diff --staged --quiet || git commit -m "Estado ATMs actualizado $(date +'%d/%m/%Y %H:%M')"
+          git push
