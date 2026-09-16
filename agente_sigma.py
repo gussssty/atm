@@ -214,11 +214,75 @@ def descargar_excel(session):
     return None
 
 def procesar_excel(contenido):
-    """Procesa el Excel y devuelve dict con estado por ATM."""
-    if isinstance(contenido, bytes):
-        df = pd.read_excel(io.BytesIO(contenido), header=0)
-    else:
-        df = pd.read_excel(contenido, header=0)
+    """Procesa el archivo descargado de SIGMA (Excel o HTML) y devuelve dict con estado por ATM."""
+    if not isinstance(contenido, bytes):
+        with open(contenido, 'rb') as f:
+            contenido = f.read()
+
+    # Detectar formato real por los primeros bytes
+    inicio = contenido[:20].strip()
+    print(f'  Primeros bytes: {contenido[:60]}')
+
+    df = None
+
+    # 1. Intentar como HTML (SIGMA suele devolver HTML con extensión .xls)
+    if inicio.startswith(b'<') or b'<html' in contenido[:500].lower() or b'<table' in contenido[:500].lower():
+        print('  Formato detectado: HTML')
+        try:
+            tablas = pd.read_html(io.BytesIO(contenido), encoding='utf-8')
+            if not tablas:
+                tablas = pd.read_html(io.BytesIO(contenido), encoding='latin1')
+            # Buscar la tabla que tenga columna Terminal
+            for tabla in tablas:
+                cols = [str(c).lower() for c in tabla.columns]
+                if any('terminal' in c for c in cols):
+                    df = tabla
+                    # Renombrar columnas si están en minúsculas
+                    df.columns = [str(c).strip() for c in df.columns]
+                    print(f'  Tabla encontrada: {len(df)} filas, cols: {list(df.columns)[:6]}')
+                    break
+            if df is None and tablas:
+                df = tablas[0]
+                print(f'  Usando primera tabla: {len(df)} filas')
+        except Exception as e:
+            print(f'  Error parseando HTML: {e}')
+
+    # 2. Intentar como XLS binario
+    if df is None:
+        print('  Intentando como XLS binario...')
+        try:
+            df = pd.read_excel(io.BytesIO(contenido), header=0, engine='xlrd')
+        except Exception as e:
+            print(f'  XLS falló: {e}')
+
+    # 3. Intentar como XLSX
+    if df is None:
+        print('  Intentando como XLSX...')
+        try:
+            df = pd.read_excel(io.BytesIO(contenido), header=0, engine='openpyxl')
+        except Exception as e:
+            print(f'  XLSX falló: {e}')
+
+    # 4. Intentar como CSV
+    if df is None:
+        print('  Intentando como CSV...')
+        try:
+            import csv as csv_mod
+            for sep in [';', ',', '\t']:
+                try:
+                    df = pd.read_csv(io.BytesIO(contenido), sep=sep, encoding='latin1')
+                    if len(df.columns) > 3:
+                        print(f'  CSV con sep={sep!r}: {len(df)} filas')
+                        break
+                except: pass
+        except Exception as e:
+            print(f'  CSV falló: {e}')
+
+    if df is None:
+        # Guardar para diagnóstico
+        with open('sigma_raw_download', 'wb') as f:
+            f.write(contenido)
+        raise ValueError('No se pudo parsear el archivo descargado de SIGMA. Guardado como sigma_raw_download para diagnóstico.')
 
     print(f'  📊 {len(df)} terminales | Estados: {df["Estado Fisico"].value_counts().to_dict()}')
 
