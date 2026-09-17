@@ -3,7 +3,7 @@ name: Actualizar Estado ATMs
 on:
   schedule:
     - cron: '0 * * * *'   # cada hora en punto
-  workflow_dispatch:        # también permite correrlo manualmente desde GitHub
+  workflow_dispatch:        # permite correrlo manualmente desde GitHub
 
 jobs:
   actualizar:
@@ -26,7 +26,7 @@ jobs:
           sudo apt-get install -y google-chrome-stable
 
       - name: Instalar dependencias Python
-        run: pip install selenium pandas xlrd openpyxl webdriver-manager
+        run: pip install selenium webdriver-manager pandas xlrd openpyxl lxml html5lib
 
       - name: Descargar estado de SIGMA y generar JSON
         env:
@@ -34,12 +34,14 @@ jobs:
           SIGMA_PASSWORD: ${{ secrets.SIGMA_PASSWORD }}
         run: python agente_sigma.py
 
-      - name: Subir debug HTML si falló
+      - name: Subir archivos de debug si falló
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: sigma-debug
-          path: sigma_debug.html
+          path: |
+            sigma_debug.html
+            sigma_monitor.html
           if-no-files-found: ignore
 
       - name: Subir estado_atms.json al repo
