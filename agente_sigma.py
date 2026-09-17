@@ -10,8 +10,10 @@ from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from webdriver_manager.chrome import ChromeDriverManager
 
 SIGMA_USER     = os.environ.get('SIGMA_USER', '')
 SIGMA_PASSWORD = os.environ.get('SIGMA_PASSWORD', '')
@@ -45,7 +47,9 @@ def crear_driver():
         'download.directory_upgrade':    True,
         'safebrowsing.enabled':          False,
     })
-    driver = webdriver.Chrome(options=opts)
+    # Usar webdriver-manager para que coincida la versión de Chrome
+    service = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service, options=opts)
     driver.set_page_load_timeout(30)
     return driver
 
@@ -129,18 +133,17 @@ def descargar_excel(driver):
     # Buscar botón DESCARGAR — el verde con ícono Excel de la captura
     btn_descargar = None
     selectores = [
+        'a#form\\:buttonExportXlsTerm',   # ID exacto detectado en SIGMA
+        '[id*="buttonExportXls"]',
+        '[id*="ExportXls"]',
+        '[id*="exportXls"]',
         'input[value*="DESCARGAR"]',
         'input[value*="Descargar"]',
-        'input[value*="descargar"]',
-        'button[value*="DESCARGAR"]',
         'a[title*="Excel"]',
         'a[title*="excel"]',
         'input[id*="excel"]',
-        'input[id*="Excel"]',
         'button[id*="excel"]',
         '.x-excel-btn',
-        'img[src*="excel"]',
-        'input[src*="excel"]',
     ]
 
     for sel in selectores:
@@ -169,6 +172,27 @@ def descargar_excel(driver):
                             break
                 except: pass
             if btn_descargar: break
+
+    # Intentar por ID exacto via JavaScript como último recurso
+    if not btn_descargar:
+        print('  Intentando por ID exacto via JavaScript...')
+        try:
+            driver.execute_script(
+                "document.getElementById('form:buttonExportXlsTerm').click();"
+            )
+            print('  ✓ Click via JS en form:buttonExportXlsTerm')
+            # Esperar descarga directamente
+            time.sleep(3)
+            despues2 = set(glob.glob(os.path.join(download_dir, '*.xls*')) +
+                           glob.glob(os.path.join(download_dir, '*.csv')))
+            nuevos2 = {f for f in despues2 - antes if not f.endswith('.crdownload')}
+            if nuevos2:
+                archivo2 = list(nuevos2)[0]
+                print(f'  ✓ Descargado: {os.path.basename(archivo2)} ({os.path.getsize(archivo2)//1024} KB)')
+                with open(archivo2,'rb') as fh:
+                    return fh.read(), os.path.basename(archivo2)
+        except Exception as e:
+            print(f'  JS click falló: {e}')
 
     if not btn_descargar:
         print('  ✗ No se encontró el botón DESCARGAR')
