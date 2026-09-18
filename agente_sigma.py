@@ -6,7 +6,7 @@ Flujo: Login → navegar a vistaPorTerminal → click DESCARGAR → procesar Exc
 
 import os, io, json, time, glob
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
@@ -303,7 +303,8 @@ def procesar_excel(resultado):
     return estado_atms
 
 def generar_json(estado_atms, ruta='estado_atms.json'):
-    ahora_dt = datetime.now()
+    ARG = timezone(timedelta(hours=-3))
+    ahora_dt = datetime.now(ARG)
     ahora    = f"{DIAS[ahora_dt.weekday()]} {ahora_dt.strftime('%d/%m/%Y %H:%M')}hs"
     resumen  = {}
     for cfg in ESTADO_CONFIG.values():
@@ -323,7 +324,7 @@ def main():
     sep = '=' * 56
     print(f'\n{sep}')
     print(f'  AGENTE SIGMA — ATMs BPN')
-    print(f'  {datetime.now().strftime("%d/%m/%Y %H:%M:%S")}')
+    print(f'  {datetime.now(timezone(timedelta(hours=-3))).strftime("%d/%m/%Y %H:%M:%S")} (ARG)')
     print(f'{sep}\n')
 
     if not SIGMA_USER or not SIGMA_PASSWORD:
