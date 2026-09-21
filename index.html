@@ -6,6 +6,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#1a6db5">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>ATMs BPN</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
@@ -305,7 +308,9 @@ function colorEstado(estado){
 }
 
 function cargarEstado(){
-  fetch('estado_atms.json?t=' + Date.now())
+  // Cache-busting: timestamp + versión aleatoria para evitar cache del navegador
+  const cacheBust = Date.now() + '-' + Math.random().toString(36).slice(2,6);
+  fetch('estado_atms.json?v=' + cacheBust, {cache: 'no-store'})
     .then(r=>{ if(!r.ok) throw new Error('Sin archivo'); return r.json(); })
     .then(data=>{
       // data.atms keys son strings
@@ -437,7 +442,7 @@ function filtrar(){
     if(ciu  && a.ciudad!==ciu)                        return false;
     if(marc && !a.marca.toLowerCase().includes(marc)) return false;
     if(q){
-      const txt=[a.id,a.nombre,a.ciudad,a.direccion,a.ip,
+      const txt=[a.id,a.nombre,a.ciudad,a.direccion,
         ...(a.contactos||[]).map(c=>c.nombre+' '+c.rol)
       ].join(' ').toLowerCase();
       if(!txt.includes(q)) return false;
@@ -651,10 +656,7 @@ function sel(atm){
         <div class="dato-lbl">Marca / Modelo</div>
         <div class="dato-val">${badge(atm.marca, atm.modelo)} ${atm.modelo||''}</div>
       </div>
-      <div class="dato">
-        <div class="dato-lbl">IP</div>
-        <div class="dato-val ip">${atm.ip||'No registrada'}</div>
-      </div>
+
       <div class="dato" style="grid-column:1/-1">
         <div class="dato-lbl">Dirección</div>
         <div class="dato-val" style="font-size:12px">${atm.direccion||'—'}</div>
