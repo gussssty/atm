@@ -563,18 +563,7 @@ function abrirFicha(atm){
         ['Aplicativo',    det['Aplicativo']],
       ]
     },
-    {
-      titulo:'Red / Conectividad',
-      campos:[
-        ['IP ATM',    det['IP ATM']||atm.ip],
-        ['IP LINK',   det['IP LINK']],
-        ['Gateway',   det['Gateway']],
-        ['Máscara',   det['Máscara']],
-        ['Latitud',   atm.lat?String(atm.lat):''],
-        ['Longitud',  atm.lon?String(atm.lon):''],
-      ],
-      mono:true
-    },
+
     {
       titulo:'Capacidades',
       campos:[
@@ -723,4 +712,3 @@ if(!isMob()) document.getElementById('vista-mapa').classList.add('visible');
 </script>
 </body>
 </html>
-
