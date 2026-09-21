@@ -1,13 +1,13 @@
 {
-  "actualizado": "Lunes 21/09/2026 14:23hs",
+  "actualizado": "Lunes 21/09/2026 14:36hs",
   "total": 224,
   "resumen": {
-    "Operativo": 115,
+    "Operativo": 116,
     "Advertencia": 41,
     "Sin insumos": 41,
-    "No dispensa": 6,
+    "No dispensa": 7,
     "Falla depósito": 6,
-    "Fuera de servicio": 15
+    "Fuera de servicio": 13
   },
   "atms": {
     "9697": {
@@ -81,18 +81,6 @@
       "fecha": "21/09/2026 09:50",
       "conectiv": "TCP/IP",
       "carga": "INICIO DE CARGA"
-    },
-    "9663": {
-      "estado": "FUERA DE SERVICIO",
-      "label": "Fuera de servicio",
-      "color": "#E53935",
-      "icono": "✗",
-      "falla": "Comunicacion - Offline (DOWN)",
-      "falla_corta": "Offline (DOWN)",
-      "falla_cat": "Comunicacion",
-      "fecha": "21/09/2026 13:58",
-      "conectiv": "TCP/IP",
-      "carga": "CARGA ABORTADA !!"
     },
     "9649": {
       "estado": "FUERA DE SERVICIO",
@@ -178,18 +166,6 @@
       "conectiv": "TCP/IP",
       "carga": "INICIO DE CARGA"
     },
-    "5308": {
-      "estado": "FUERA DE SERVICIO",
-      "label": "Fuera de servicio",
-      "color": "#E53935",
-      "icono": "✗",
-      "falla": "Modo Supervisor - Activado",
-      "falla_corta": "Activado",
-      "falla_cat": "Modo Supervisor",
-      "fecha": "21/09/2026 14:21",
-      "conectiv": "TCP/IP",
-      "carga": "CARGA ABORTADA !!"
-    },
     "9670": {
       "estado": "NO PAGA",
       "label": "No dispensa",
@@ -199,6 +175,18 @@
       "falla_corta": "Vacio",
       "falla_cat": "Cartuchos",
       "fecha": "21/09/2026 13:31",
+      "conectiv": "TCP/IP",
+      "carga": "CARGA ABORTADA !!"
+    },
+    "9663": {
+      "estado": "NO PAGA",
+      "label": "No dispensa",
+      "color": "#E53935",
+      "icono": "💸",
+      "falla": "Cartuchos - Vacio",
+      "falla_corta": "Vacio",
+      "falla_cat": "Cartuchos",
+      "fecha": "21/09/2026 14:33",
       "conectiv": "TCP/IP",
       "carga": "CARGA ABORTADA !!"
     },
@@ -2385,6 +2373,18 @@
       "fecha": "21/09/2026 13:20",
       "conectiv": "TCP/IP",
       "carga": "CONTINUA CARGANDO"
+    },
+    "5308": {
+      "estado": "OK",
+      "label": "Operativo",
+      "color": "#43A047",
+      "icono": "✓",
+      "falla": "nan",
+      "falla_corta": "nan",
+      "falla_cat": "",
+      "fecha": "21/09/2026 14:23",
+      "conectiv": "TCP/IP",
+      "carga": "CARGA ABORTADA !!"
     },
     "5304": {
       "estado": "OK",
