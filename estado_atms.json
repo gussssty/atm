@@ -1,9 +1,9 @@
 {
-  "actualizado": "Viernes 25/09/2026 23:55hs",
+  "actualizado": "Sábado 26/09/2026 05:13hs",
   "total": 225,
   "resumen": {
-    "Operativo": 104,
-    "Advertencia": 68,
+    "Operativo": 103,
+    "Advertencia": 69,
     "Sin insumos": 38,
     "No dispensa": 5,
     "Falla depósito": 6,
@@ -1246,6 +1246,18 @@
       "conectiv": "TCP/IP",
       "carga": "CONTINUA CARGANDO"
     },
+    "5315": {
+      "estado": "ADVERTENCIA",
+      "label": "Advertencia",
+      "color": "#43A047",
+      "icono": "⚠",
+      "falla": "Dispensador - Advertencia",
+      "falla_corta": "Advertencia",
+      "falla_cat": "Dispensador",
+      "fecha": "25/09/2026 23:57",
+      "conectiv": "TCP/IP",
+      "carga": "CONTINUA CARGANDO"
+    },
     "5312": {
       "estado": "ADVERTENCIA",
       "label": "Advertencia",
@@ -1902,7 +1914,7 @@
       "falla": "nan",
       "falla_corta": "nan",
       "falla_cat": "",
-      "fecha": "22/09/2026 14:48",
+      "fecha": "26/09/2026 03:34",
       "conectiv": "TCP/IP",
       "carga": "INICIO DE CARGA"
     },
@@ -2457,18 +2469,6 @@
       "fecha": "25/09/2026 09:00",
       "conectiv": "TCP/IP",
       "carga": "CARGA ABORTADA !!"
-    },
-    "5315": {
-      "estado": "OK",
-      "label": "Operativo",
-      "color": "#43A047",
-      "icono": "✓",
-      "falla": "nan",
-      "falla_corta": "nan",
-      "falla_cat": "",
-      "fecha": "25/09/2026 11:35",
-      "conectiv": "TCP/IP",
-      "carga": "CONTINUA CARGANDO"
     },
     "5314": {
       "estado": "OK",
