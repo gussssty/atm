@@ -1,13 +1,13 @@
 {
-  "actualizado": "Sábado 17/10/2026 23:29hs",
+  "actualizado": "Domingo 18/10/2026 04:39hs",
   "total": 221,
   "resumen": {
     "Operativo": 59,
     "Advertencia": 98,
-    "Sin insumos": 42,
+    "Sin insumos": 41,
     "No dispensa": 8,
     "Falla depósito": 5,
-    "Fuera de servicio": 9
+    "Fuera de servicio": 10
   },
   "atms": {
     "21230": {
@@ -117,6 +117,18 @@
       "fecha": "27/04/2026 12:49",
       "conectiv": "TCP/IP",
       "carga": "INICIO DE CARGA"
+    },
+    "2523": {
+      "estado": "FUERA DE SERVICIO",
+      "label": "Fuera de servicio",
+      "color": "#E53935",
+      "icono": "✗",
+      "falla": "Lectora - Fuera de Servicio",
+      "falla_corta": "Fuera de Servicio",
+      "falla_cat": "Lectora",
+      "fecha": "18/10/2026 03:21",
+      "conectiv": "TCP/IP",
+      "carga": "CONTINUA CARGANDO"
     },
     "21202": {
       "estado": "NO PAGA",
@@ -366,7 +378,7 @@
       "falla": "Hopper 2 - Vacio",
       "falla_corta": "Vacio",
       "falla_cat": "Hopper 2",
-      "fecha": "16/10/2026 19:23",
+      "fecha": "18/10/2026 04:22",
       "conectiv": "TCP/IP",
       "carga": "INICIO DE CARGA"
     },
@@ -435,9 +447,9 @@
       "label": "Sin insumos",
       "color": "#43A047",
       "icono": "📦",
-      "falla": "Hopper 2 - Vacio",
+      "falla": "Hopper 1 - Vacio",
       "falla_corta": "Vacio",
-      "falla_cat": "Hopper 2",
+      "falla_cat": "Hopper 1",
       "fecha": "17/10/2026 22:04",
       "conectiv": "TCP/IP",
       "carga": "CARGA ABORTADA !!"
@@ -754,18 +766,6 @@
       "conectiv": "TCP/IP",
       "carga": "INICIO DE CARGA"
     },
-    "2523": {
-      "estado": "INSUMOS",
-      "label": "Sin insumos",
-      "color": "#43A047",
-      "icono": "📦",
-      "falla": "Hopper 1 - Vacio",
-      "falla_corta": "Vacio",
-      "falla_cat": "Hopper 1",
-      "fecha": "16/10/2026 11:42",
-      "conectiv": "TCP/IP",
-      "carga": "CONTINUA CARGANDO"
-    },
     "2513": {
       "estado": "INSUMOS",
       "label": "Sin insumos",
@@ -1038,7 +1038,7 @@
       "falla": "Lectora - Advertencia",
       "falla_corta": "Advertencia",
       "falla_cat": "Lectora",
-      "fecha": "17/10/2026 10:12",
+      "fecha": "17/10/2026 23:52",
       "conectiv": "TCP/IP",
       "carga": "CONTINUA CARGANDO"
     },
@@ -1398,7 +1398,7 @@
       "falla": "Lectora - Advertencia",
       "falla_corta": "Advertencia",
       "falla_cat": "Lectora",
-      "fecha": "16/10/2026 19:05",
+      "fecha": "18/10/2026 01:36",
       "conectiv": "TCP/IP",
       "carga": "CARGA ABORTADA !!"
     },
