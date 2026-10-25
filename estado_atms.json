@@ -1,9 +1,9 @@
 {
-  "actualizado": "Domingo 25/10/2026 14:21hs",
+  "actualizado": "Domingo 25/10/2026 17:15hs",
   "total": 218,
   "resumen": {
-    "Operativo": 57,
-    "Advertencia": 107,
+    "Operativo": 56,
+    "Advertencia": 108,
     "Sin insumos": 34,
     "No dispensa": 5,
     "Falla depósito": 5,
@@ -627,8 +627,8 @@
       "label": "Sin insumos",
       "color": "#43A047",
       "icono": "📦",
-      "falla": "Hopper 3 - Poco",
-      "falla_corta": "Poco",
+      "falla": "Hopper 3 - Vacio",
+      "falla_corta": "Vacio",
       "falla_cat": "Hopper 3",
       "fecha": "24/10/2026 21:39",
       "conectiv": "TCP/IP",
@@ -907,6 +907,18 @@
       "falla_corta": "Advertencia",
       "falla_cat": "Lectora",
       "fecha": "24/10/2026 16:23",
+      "conectiv": "TCP/IP",
+      "carga": "INICIO DE CARGA"
+    },
+    "9687": {
+      "estado": "ADVERTENCIA",
+      "label": "Advertencia",
+      "color": "#43A047",
+      "icono": "⚠",
+      "falla": "Lectora - Advertencia",
+      "falla_corta": "Advertencia",
+      "falla_cat": "Lectora",
+      "fecha": "25/10/2026 15:23",
       "conectiv": "TCP/IP",
       "carga": "INICIO DE CARGA"
     },
@@ -1999,18 +2011,6 @@
       "falla_corta": "nan",
       "falla_cat": "",
       "fecha": "22/10/2026 07:10",
-      "conectiv": "TCP/IP",
-      "carga": "INICIO DE CARGA"
-    },
-    "9687": {
-      "estado": "OK",
-      "label": "Operativo",
-      "color": "#43A047",
-      "icono": "✓",
-      "falla": "nan",
-      "falla_corta": "nan",
-      "falla_cat": "",
-      "fecha": "25/10/2026 10:05",
       "conectiv": "TCP/IP",
       "carga": "INICIO DE CARGA"
     },
