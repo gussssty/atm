@@ -67,7 +67,7 @@ def buscar_tickets():
         }
 
         resp = requests.get(
-            f'{base_url}/search',
+            f'{base_url}/search/jql',
             headers=headers,
             params=params,
             timeout=30,
