@@ -244,6 +244,7 @@ select{padding:7px 10px;border:1.5px solid #d1d5db;border-radius:8px;
 .sb-item.activo{border-color:#fff;background:rgba(255,255,255,.2)}
 .sb-item.activo-ok{border-color:#43A047;background:rgba(67,160,71,.25)}
 .sb-item.activo-fds{border-color:#E53935;background:rgba(229,57,53,.25)}
+.sb-item.activo-ticket{border-color:#FF8C00;background:rgba(255,140,0,.25)}
 .sb-dot{width:8px;height:8px;border-radius:50%}
 #sigma-ts{font-size:11px;opacity:.85;margin-left:auto;white-space:nowrap;flex-shrink:0;font-weight:600}
 </style>
@@ -262,7 +263,7 @@ select{padding:7px 10px;border:1.5px solid #d1d5db;border-radius:8px;
 <div id="sigma-banner">
   <span class="sb-item" id="btn-ok" onclick="filtrarEstado('ok')" title="Filtrar operativos"><span class="sb-dot" style="background:#43A047"></span><span id="sb-ok">— Operativos</span></span>
   <span class="sb-item" id="btn-fds" onclick="filtrarEstado('fds')" title="Filtrar con problemas"><span class="sb-dot" style="background:#E53935"></span><span id="sb-fds">— Con problemas</span></span>
-  <span class="sb-item sb-jira-item" title="Cajeros con pedido técnico en Jira"><span class="sb-dot" style="background:#FF8C00"></span><span id="sb-jira">— con ticket</span></span>
+  <span class="sb-item" id="btn-ticket" onclick="filtrarEstado('ticket')" title="Filtrar con ticket técnico"><span class="sb-dot" style="background:#FF8C00"></span><span id="sb-jira">— con ticket</span></span>
   <span id="sigma-ts">Sin datos de estado</span>
 </div>
 <div id="barra-busqueda">
@@ -510,30 +511,30 @@ function renderMks(lista){
 }
 
 // ── FILTRO POR ESTADO SIGMA ──────────────────────────────────────────────────
-let filtroEstadoActivo = null; // 'ok' | 'fds' | null
+let filtroEstadoActivo = null; // 'ok' | 'fds' | 'ticket' | null
 
 function filtrarEstado(tipo){
-  const btnOk  = document.getElementById('btn-ok');
-  const btnFds = document.getElementById('btn-fds');
+  const btnOk     = document.getElementById('btn-ok');
+  const btnFds    = document.getElementById('btn-fds');
+  const btnTicket = document.getElementById('btn-ticket');
 
+  // Click en el mismo botón activo → desactivar
   if(filtroEstadoActivo === tipo){
-    // Click en el mismo — desactivar filtro
     filtroEstadoActivo = null;
     btnOk.classList.remove('activo','activo-ok');
     btnFds.classList.remove('activo','activo-fds');
+    btnTicket.classList.remove('activo','activo-ticket');
   } else {
     filtroEstadoActivo = tipo;
-    btnOk.classList.toggle('activo-ok',  tipo==='ok');
-    btnFds.classList.toggle('activo-fds', tipo==='fds');
-    btnOk.classList.toggle('activo',  tipo==='ok');
-    btnFds.classList.toggle('activo', tipo==='fds');
-    if(tipo==='ok'){
-      btnFds.classList.remove('activo','activo-fds');
-    } else {
-      btnOk.classList.remove('activo','activo-ok');
-    }
+    // Limpiar todos primero
+    btnOk.classList.remove('activo','activo-ok');
+    btnFds.classList.remove('activo','activo-fds');
+    btnTicket.classList.remove('activo','activo-ticket');
+    // Activar el seleccionado
+    if(tipo==='ok')     { btnOk.classList.add('activo','activo-ok'); }
+    if(tipo==='fds')    { btnFds.classList.add('activo','activo-fds'); }
+    if(tipo==='ticket') { btnTicket.classList.add('activo','activo-ticket'); }
   }
-  // Re-aplicar todos los filtros
   filtrar();
 }
 
@@ -564,8 +565,10 @@ function filtrar(){
       const e = SIGMA[a.id];
       const esProblema = e && (e.estado==='FUERA DE SERVICIO' || e.estado==='NO PAGA');
       const esOk       = !e || !esProblema;
-      if(filtroEstadoActivo==='ok'  && !esOk)       return false;
-      if(filtroEstadoActivo==='fds' && !esProblema) return false;
+      const tieneTicket = !!(JIRA[a.id] && JIRA[a.id].length);
+      if(filtroEstadoActivo==='ok'     && !esOk)       return false;
+      if(filtroEstadoActivo==='fds'    && !esProblema) return false;
+      if(filtroEstadoActivo==='ticket' && !tieneTicket) return false;
     }
     return true;
   });
@@ -583,6 +586,7 @@ function limpiar(){
   filtroEstadoActivo = null;
   document.getElementById('btn-ok').classList.remove('activo','activo-ok');
   document.getElementById('btn-fds').classList.remove('activo','activo-fds');
+  document.getElementById('btn-ticket').classList.remove('activo','activo-ticket');
   filtrar(); mapa.setView([-38.95,-68.07],8);
 }
 
