@@ -328,6 +328,18 @@ function colorEstado(estado){
   return '#43A047'; // verde para OK, ADVERTENCIA, INSUMOS, DEPOSITO
 }
 
+// Color final del cajero: rojo > naranja (ticket) > verde > gris
+function colorAtm(atm_id){
+  const e = SIGMA[atm_id];
+  if(e){
+    const c = colorEstado(e.estado);
+    if(c === '#E53935') return '#E53935'; // rojo tiene prioridad
+  }
+  if(JIRA[atm_id] && JIRA[atm_id].length) return '#FF8C00'; // naranja = ticket abierto
+  if(e) return colorEstado(e.estado); // verde
+  return '#90A4AE'; // gris sin datos
+}
+
 // ── TICKETS JIRA ─────────────────────────────────────────────────────────────
 const JIRA = {};  // JIRA[atm_id] = [{key, desc, estado, creado, url}, ...]
 
@@ -482,9 +494,7 @@ function rolCls(rol){
 }
 function crearMk(atm){
   if(!atm.lat||!atm.lon) return null;
-  const e   = SIGMA[atm.id];
-  // Color de fondo según estado SIGMA; si no hay datos, usar gris neutro
-  const bgCol = e ? colorEstado(e.estado) : '#90A4AE';
+  const bgCol = colorAtm(atm.id);
   const ico=L.divIcon({className:'',
     html:`<div class="mk" style="background:${bgCol};color:#000;border-color:rgba(0,0,0,.25)">${atm.id}</div>`,
     iconAnchor:[20,10]});
@@ -582,7 +592,7 @@ function renderLista(lista){
   el.innerHTML=lista.slice(0,300).map(a=>{
     const c0=a.contactos&&a.contactos[0];
     return `<div class="li" onclick="sel(TODOS.find(x=>x.id===${a.id}))">
-      <div class="li-logo"><img src="${LOGO}" alt="BPN" loading="lazy"></div>
+      <div class="li-logo" style="background:${colorAtm(a.id)};border-color:${colorAtm(a.id)}"><img src="${LOGO}" alt="BPN" loading="lazy" style="mix-blend-mode:multiply;opacity:.92"></div>
       <div class="li-body">
         <div class="li-title">${a.id} — ${a.nombre}</div>
         <div class="li-sub">📍 ${a.ciudad||'—'} &nbsp;·&nbsp; ${badge(a.marca, a.modelo)}</div>
@@ -616,8 +626,7 @@ function volverLista(){
     // Desktop: volver a vista inicial — mapa centrado, marcadores sin resaltar
     document.getElementById('detalle-body').innerHTML='';
     mks.forEach(mk=>{
-      const e3  = SIGMA[mk._d.id];
-      const bg3 = e3 ? colorEstado(e3.estado) : '#90A4AE';
+      const bg3 = colorAtm(mk._d.id);
       mk.setIcon(L.divIcon({className:'',
         html:`<div class="mk" style="background:${bg3};color:#000;border-color:rgba(0,0,0,.25)">${mk._d.id}</div>`,
         iconAnchor:[20,10]}));
@@ -746,8 +755,7 @@ function sel(atm){
   // Resaltar marcador
   mks.forEach(mk=>{
     const activo = mk._d.id===atm.id;
-    const eH  = SIGMA[mk._d.id];
-    const bgH = eH ? colorEstado(eH.estado) : '#90A4AE';
+    const bgH = colorAtm(mk._d.id);
     mk.setIcon(L.divIcon({className:'',
       html:`<div class="mk" style="background:${bgH};color:#000;border-color:rgba(0,0,0,.25);${activo?'transform:scale(1.5);z-index:999;box-shadow:0 0 0 3px gold':''}">${mk._d.id}</div>`,
       iconAnchor:[20,10]}));
@@ -785,8 +793,7 @@ function sel(atm){
 }
 mapa.on('click', ()=>{
   mks.forEach(mk=>{
-    const eC  = SIGMA[mk._d.id];
-    const bgC = eC ? colorEstado(eC.estado) : '#90A4AE';
+    const bgC = colorAtm(mk._d.id);
     mk.setIcon(L.divIcon({className:'',
       html:`<div class="mk" style="background:${bgC};color:#000;border-color:rgba(0,0,0,.25)">${mk._d.id}</div>`,
       iconAnchor:[20,10]}));
@@ -809,8 +816,7 @@ function abrirMapaCompleto(){
     },50);
     // Quitar resaltado de marcadores
     mks.forEach(mk=>{
-      const eC  = SIGMA[mk._d.id];
-      const bgC = eC ? colorEstado(eC.estado) : '#90A4AE';
+      const bgC = colorAtm(mk._d.id);
       mk.setIcon(L.divIcon({className:'',
         html:`<div class="mk" style="background:${bgC};color:#000;border-color:rgba(0,0,0,.25)">${mk._d.id}</div>`,
         iconAnchor:[20,10]}));
