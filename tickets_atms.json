@@ -1,43 +1,32 @@
 {
-  "actualizado": "Martes 27/10/2026 12:39hs",
-  "total_tickets": 6,
+  "actualizado": "Martes 27/10/2026 17:21hs",
+  "total_tickets": 5,
   "atms_con_tickets": 5,
   "tickets": {
+    "9651": [
+      {
+        "key": "SIT-56098",
+        "atm_id": 9651,
+        "resumen": "ATM 9651 - Diebold - Chihuidos - se solicita un mantenimiento preventivo, cajero con mucho polvillo en general. ",
+        "desc": "Diebold - Chihuidos - se solicita un mantenimiento preventivo, cajero con mucho polvillo en general.",
+        "estado": "Pendiente proveedor",
+        "tipo": "Reporte de errores y fallas - CAUT",
+        "prioridad": "Alta",
+        "creado": "27/10/2026 13:01",
+        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-56098"
+      }
+    ],
     "9695": [
       {
         "key": "SIT-56055",
         "atm_id": 9695,
-        "resumen": "ATM 9695 - Wincor - Canal V - Módulos 3 y 4",
-        "desc": "Wincor - Canal V - Módulos 3 y 4",
-        "estado": "En progreso",
+        "resumen": "ATM 9695 - Wincor - Canal V - Módulos 3 y 4. No realiza el test cash ni borra los contadores",
+        "desc": "Wincor - Canal V - Módulos 3 y 4. No realiza el test cash ni borra los contadores",
+        "estado": "Pendiente proveedor",
         "tipo": "Reporte de errores y fallas - CAUT",
         "prioridad": "Alta",
         "creado": "27/10/2026 08:44",
         "url": "https://servicedeskbpn.atlassian.net/browse/SIT-56055"
-      }
-    ],
-    "2543": [
-      {
-        "key": "SIT-55960",
-        "atm_id": 2543,
-        "resumen": "ATM 2543 - Wincor - Centenario - Falla impresora, no corta el papel correctamente.",
-        "desc": "Wincor - Centenario - Falla impresora, no corta el papel correctamente.",
-        "estado": "En progreso",
-        "tipo": "Reporte de errores y fallas - CAUT",
-        "prioridad": "Alta",
-        "creado": "26/10/2026 08:51",
-        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-55960"
-      },
-      {
-        "key": "SIT-55953",
-        "atm_id": 2543,
-        "resumen": "ATM 2543 - Wincor - Centenario - Falla dispenser. Error 1.8, traba dinero en el clamp",
-        "desc": "Wincor - Centenario - Falla dispenser. Error 1.8, traba dinero en el clamp",
-        "estado": "En progreso",
-        "tipo": "Reporte de errores y fallas - CAUT",
-        "prioridad": "Alta",
-        "creado": "26/10/2026 08:26",
-        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-55953"
       }
     ],
     "6388": [
