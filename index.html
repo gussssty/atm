@@ -186,7 +186,7 @@ select{padding:7px 10px;border:1.5px solid #d1d5db;border-radius:8px;
   -webkit-user-select:none}
 .li:active{transform:scale(.98);background:#f0f4f8}
 .li-logo{width:40px;height:40px;border-radius:10px;overflow:hidden;
-  flex-shrink:0;border:1.5px solid #e5e7eb}
+  flex-shrink:0;border:3px solid #e5e7eb;transition:border-color .3s,box-shadow .3s}
 .li-logo img{width:100%;height:100%;object-fit:cover}
 .li-body{flex:1;min-width:0}
 .li-title{font-size:14px;font-weight:700;white-space:nowrap;
@@ -592,7 +592,7 @@ function renderLista(lista){
   el.innerHTML=lista.slice(0,300).map(a=>{
     const c0=a.contactos&&a.contactos[0];
     return `<div class="li" onclick="sel(TODOS.find(x=>x.id===${a.id}))">
-      <div class="li-logo" style="background:${colorAtm(a.id)};border-color:${colorAtm(a.id)}"><img src="${LOGO}" alt="BPN" loading="lazy" style="mix-blend-mode:multiply;opacity:.92"></div>
+      <div class="li-logo" style="border:3px solid ${colorAtm(a.id)};box-shadow:0 0 0 1px ${colorAtm(a.id)}40"><img src="${LOGO}" alt="BPN" loading="lazy"></div>
       <div class="li-body">
         <div class="li-title">${a.id} — ${a.nombre}</div>
         <div class="li-sub">📍 ${a.ciudad||'—'} &nbsp;·&nbsp; ${badge(a.marca, a.modelo)}</div>
