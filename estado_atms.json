@@ -1,13 +1,13 @@
 {
-  "actualizado": "Martes 27/10/2026 00:12hs",
-  "total": 218,
+  "actualizado": "Martes 27/10/2026 06:30hs",
+  "total": 217,
   "resumen": {
-    "Operativo": 80,
-    "Advertencia": 75,
-    "Sin insumos": 36,
+    "Operativo": 76,
+    "Advertencia": 78,
+    "Sin insumos": 37,
     "No dispensa": 6,
     "Falla depósito": 7,
-    "Fuera de servicio": 14
+    "Fuera de servicio": 13
   },
   "atms": {
     "21230": {
@@ -57,18 +57,6 @@
       "fecha": "01/10/2026 09:44",
       "conectiv": "TCP/IP",
       "carga": "CARGA ABORTADA !!"
-    },
-    "9681": {
-      "estado": "FUERA DE SERVICIO",
-      "label": "Fuera de servicio",
-      "color": "#E53935",
-      "icono": "✗",
-      "falla": "Comunicacion - Offline (DOWN)",
-      "falla_corta": "Offline (DOWN)",
-      "falla_cat": "Comunicacion",
-      "fecha": "23/10/2026 07:49",
-      "conectiv": "TCP/IP",
-      "carga": "INICIO DE CARGA"
     },
     "9658": {
       "estado": "FUERA DE SERVICIO",
@@ -366,7 +354,7 @@
       "falla": "Hopper 4 - Vacio",
       "falla_corta": "Vacio",
       "falla_cat": "Hopper 4",
-      "fecha": "26/10/2026 11:09",
+      "fecha": "27/10/2026 04:41",
       "conectiv": "TCP/IP",
       "carga": "INICIO DE CARGA"
     },
@@ -477,6 +465,18 @@
       "fecha": "24/10/2026 11:37",
       "conectiv": "TCP/IP",
       "carga": "INICIO DE CARGA"
+    },
+    "9632": {
+      "estado": "INSUMOS",
+      "label": "Sin insumos",
+      "color": "#43A047",
+      "icono": "📦",
+      "falla": "Hopper 1 - Vacio",
+      "falla_corta": "Vacio",
+      "falla_cat": "Hopper 1",
+      "fecha": "27/10/2026 05:45",
+      "conectiv": "TCP/IP",
+      "carga": "CONTINUA CARGANDO"
     },
     "9625": {
       "estado": "INSUMOS",
@@ -906,7 +906,7 @@
       "falla": "Lectora - Advertencia",
       "falla_corta": "Advertencia",
       "falla_cat": "Lectora",
-      "fecha": "26/10/2026 23:16",
+      "fecha": "27/10/2026 05:22",
       "conectiv": "TCP/IP",
       "carga": "INICIO DE CARGA"
     },
@@ -1090,6 +1090,18 @@
       "conectiv": "TCP/IP",
       "carga": "INICIO DE CARGA"
     },
+    "9669": {
+      "estado": "ADVERTENCIA",
+      "label": "Advertencia",
+      "color": "#43A047",
+      "icono": "⚠",
+      "falla": "Lectora - Advertencia",
+      "falla_corta": "Advertencia",
+      "falla_cat": "Lectora",
+      "fecha": "27/10/2026 06:16",
+      "conectiv": "TCP/IP",
+      "carga": "INICIO DE CARGA"
+    },
     "9668": {
       "estado": "ADVERTENCIA",
       "label": "Advertencia",
@@ -1182,7 +1194,7 @@
       "falla": "Lectora - Advertencia",
       "falla_corta": "Advertencia",
       "falla_cat": "Lectora",
-      "fecha": "26/10/2026 19:12",
+      "fecha": "27/10/2026 04:58",
       "conectiv": "TCP/IP",
       "carga": "CARGA ABORTADA !!"
     },
@@ -1233,6 +1245,18 @@
       "fecha": "26/10/2026 15:23",
       "conectiv": "TCP/IP",
       "carga": "INICIO DE CARGA"
+    },
+    "9621": {
+      "estado": "ADVERTENCIA",
+      "label": "Advertencia",
+      "color": "#43A047",
+      "icono": "⚠",
+      "falla": "Lectora - Advertencia",
+      "falla_corta": "Advertencia",
+      "falla_cat": "Lectora",
+      "fecha": "27/10/2026 02:59",
+      "conectiv": "TCP/IP",
+      "carga": "CONTINUA CARGANDO"
     },
     "9620": {
       "estado": "ADVERTENCIA",
@@ -1447,6 +1471,18 @@
       "falla_corta": "Advertencia",
       "falla_cat": "Lectora",
       "fecha": "26/10/2026 15:23",
+      "conectiv": "TCP/IP",
+      "carga": "INICIO DE CARGA"
+    },
+    "5334": {
+      "estado": "ADVERTENCIA",
+      "label": "Advertencia",
+      "color": "#43A047",
+      "icono": "⚠",
+      "falla": "Lectora - Advertencia",
+      "falla_corta": "Advertencia",
+      "falla_cat": "Lectora",
+      "fecha": "27/10/2026 00:52",
       "conectiv": "TCP/IP",
       "carga": "INICIO DE CARGA"
     },
@@ -1770,7 +1806,7 @@
       "falla": "nan",
       "falla_corta": "nan",
       "falla_cat": "",
-      "fecha": "26/10/2026 07:50",
+      "fecha": "27/10/2026 02:50",
       "conectiv": "TCP/IP",
       "carga": "CONTINUA CARGANDO"
     },
@@ -1819,18 +1855,6 @@
       "falla_corta": "nan",
       "falla_cat": "",
       "fecha": "22/10/2026 07:10",
-      "conectiv": "TCP/IP",
-      "carga": "INICIO DE CARGA"
-    },
-    "9669": {
-      "estado": "OK",
-      "label": "Operativo",
-      "color": "#43A047",
-      "icono": "✓",
-      "falla": "nan",
-      "falla_corta": "nan",
-      "falla_cat": "",
-      "fecha": "26/10/2026 12:51",
       "conectiv": "TCP/IP",
       "carga": "INICIO DE CARGA"
     },
@@ -1990,18 +2014,6 @@
       "conectiv": "TCP/IP",
       "carga": "CONTINUA CARGANDO"
     },
-    "9632": {
-      "estado": "OK",
-      "label": "Operativo",
-      "color": "#43A047",
-      "icono": "✓",
-      "falla": "nan",
-      "falla_corta": "nan",
-      "falla_cat": "",
-      "fecha": "26/10/2026 13:10",
-      "conectiv": "TCP/IP",
-      "carga": "CONTINUA CARGANDO"
-    },
     "9630": {
       "estado": "OK",
       "label": "Operativo",
@@ -2037,18 +2049,6 @@
       "fecha": "26/10/2026 12:35",
       "conectiv": "TCP/IP",
       "carga": "CARGA ABORTADA !!"
-    },
-    "9621": {
-      "estado": "OK",
-      "label": "Operativo",
-      "color": "#43A047",
-      "icono": "✓",
-      "falla": "nan",
-      "falla_corta": "nan",
-      "falla_cat": "",
-      "fecha": "26/10/2026 11:42",
-      "conectiv": "TCP/IP",
-      "carga": "CONTINUA CARGANDO"
     },
     "9611": {
       "estado": "OK",
@@ -2301,18 +2301,6 @@
       "fecha": "26/10/2026 11:53",
       "conectiv": "TCP/IP",
       "carga": "CARGA ABORTADA !!"
-    },
-    "5334": {
-      "estado": "OK",
-      "label": "Operativo",
-      "color": "#43A047",
-      "icono": "✓",
-      "falla": "nan",
-      "falla_corta": "nan",
-      "falla_cat": "",
-      "fecha": "26/10/2026 10:11",
-      "conectiv": "TCP/IP",
-      "carga": "INICIO DE CARGA"
     },
     "5333": {
       "estado": "OK",
