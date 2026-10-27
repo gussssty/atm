@@ -160,6 +160,20 @@ select{padding:7px 10px;border:1.5px solid #d1d5db;border-radius:8px;
   font-size:10px;font-weight:700}
 .b-dn{background:#D6EAF8;color:#1F4E79}
 .b-dn100{background:#E8F8F5;color:#0E6655}
+/* ── Tickets Jira ─────────────────────────────── */
+.li-ticket{font-size:11px;margin-left:2px}
+.ticket-badge{display:inline-block;background:#FFF3E0;color:#E65100;
+  border:1px solid #FF8C00;border-radius:6px;padding:3px 8px;
+  font-size:12px;font-weight:600;margin:4px 0}
+.ticket-seccion{margin:10px 0}
+.ticket-row{display:flex;flex-direction:column;gap:2px;padding:8px 10px;
+  margin:4px 0;background:#FFF8F0;border:1px solid #FFD580;border-radius:8px;
+  text-decoration:none;color:inherit;cursor:pointer}
+.ticket-row:hover{background:#FFECD1}
+.ticket-key{font-weight:700;font-size:12px;color:#E65100}
+.ticket-desc{font-size:13px;color:#333}
+.ticket-meta{font-size:11px;color:#888}
+.sb-jira-item{cursor:default}
 .b-ncr{background:#C6EFCE;color:#375623}
 .b-wincor{background:#FCE4D6;color:#843C0C}
 .b-diebold{background:#FFCCCC;color:#C9513E}
@@ -248,6 +262,7 @@ select{padding:7px 10px;border:1.5px solid #d1d5db;border-radius:8px;
 <div id="sigma-banner">
   <span class="sb-item" id="btn-ok" onclick="filtrarEstado('ok')" title="Filtrar operativos"><span class="sb-dot" style="background:#43A047"></span><span id="sb-ok">— Operativos</span></span>
   <span class="sb-item" id="btn-fds" onclick="filtrarEstado('fds')" title="Filtrar con problemas"><span class="sb-dot" style="background:#E53935"></span><span id="sb-fds">— Con problemas</span></span>
+  <span class="sb-item sb-jira-item" title="Cajeros con pedido técnico en Jira"><span class="sb-dot" style="background:#FF8C00"></span><span id="sb-jira">— con ticket</span></span>
   <span id="sigma-ts">Sin datos de estado</span>
 </div>
 <div id="barra-busqueda">
@@ -312,6 +327,59 @@ function colorEstado(estado){
   if(s==='FUERA DE SERVICIO' || s==='NO PAGA') return '#E53935'; // rojo
   return '#43A047'; // verde para OK, ADVERTENCIA, INSUMOS, DEPOSITO
 }
+
+// ── TICKETS JIRA ─────────────────────────────────────────────────────────────
+const JIRA = {};  // JIRA[atm_id] = [{key, desc, estado, creado, url}, ...]
+
+function cargarTickets(){
+  const cb = Date.now() + '-' + Math.random().toString(36).slice(2,6);
+  fetch('tickets_atms.json?v=' + cb, {cache:'no-store'})
+    .then(r=>{ if(!r.ok) throw new Error(); return r.json(); })
+    .then(data=>{
+      const ts = data.tickets || {};
+      Object.entries(ts).forEach(([id, arr])=>{ JIRA[parseInt(id)] = arr; });
+      const tot = data.total_tickets || 0;
+      const atms = data.atms_con_tickets || 0;
+      // Mostrar en banner
+      const el = document.getElementById('sb-jira');
+      if(el) el.textContent = atms + ' con ticket';
+      // re-renderizar lista para mostrar indicadores
+      renderLista(filtrados.length ? filtrados : TODOS);
+      renderMks(filtrados.length ? filtrados : TODOS);
+      console.log('✓ Tickets Jira cargados:', tot, 'tickets en', atms, 'ATMs');
+    })
+    .catch(()=>{ console.log('Sin tickets_atms.json'); });
+}
+
+function ticketBadgeHtml(atm_id){
+  const ts = JIRA[atm_id];
+  if(!ts || !ts.length) return '';
+  return `<div class="ticket-badge" title="${ts.length} ticket${ts.length>1?'s':''} abierto${ts.length>1?'s':''}">
+    🔧 ${ts.length} ticket${ts.length>1?'s':''}
+  </div>`;
+}
+
+function ticketLiDot(atm_id){
+  if(!JIRA[atm_id]) return '';
+  return `<span class="li-ticket" title="${JIRA[atm_id].length} ticket">🔧</span>`;
+}
+
+function ticketSeccionHtml(atm_id){
+  const ts = JIRA[atm_id];
+  if(!ts || !ts.length) return '';
+  const rows = ts.map(t=>`
+    <a href="${t.url}" target="_blank" class="ticket-row">
+      <span class="ticket-key">${t.key}</span>
+      <span class="ticket-desc">${t.desc||t.resumen}</span>
+      <span class="ticket-meta">${t.estado} · ${t.creado}</span>
+    </a>`).join('');
+  return `<div class="ticket-seccion">
+    <div class="c-titulo">🔧 Pedidos técnicos abiertos (${ts.length})</div>
+    ${rows}
+  </div>`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 function cargarEstado(){
   // Cache-busting: timestamp + versión aleatoria para evitar cache del navegador
@@ -520,7 +588,7 @@ function renderLista(lista){
         <div class="li-sub">📍 ${a.ciudad||'—'} &nbsp;·&nbsp; ${badge(a.marca, a.modelo)}</div>
         ${c0?`<div class="li-contacto">👤 ${c0.nombre} · ${c0.rol}</div>`:''}
       </div>
-      ${estadoLiDot(a.id)}<div class="li-arrow">›</div>
+      ${estadoLiDot(a.id)}${ticketLiDot(a.id)}<div class="li-arrow">›</div>
     </div>`;
   }).join('')+(lista.length>300?`<div style="padding:14px;text-align:center;font-size:12px;color:#888">Mostrando 300/${lista.length} — refiná la búsqueda</div>`:'')
   +'<div style="height:20px"></div>';
@@ -708,7 +776,9 @@ function sel(atm){
         <div class="dato-val" style="font-size:12px">${atm.direccion||'—'}</div>
       </div>
     </div>
-    ${estadoBadge(atm.id)}${conts?`<div class="c-titulo">Contactos de sucursal</div>${conts}`
+    ${estadoBadge(atm.id)}
+    ${ticketSeccionHtml(atm.id)}
+    ${conts?`<div class="c-titulo">Contactos de sucursal</div>${conts}`
             :`<p style="color:#aaa;font-size:13px">Sin contactos registrados</p>`}
     ${atm.lat&&atm.lon?`<a href="${gmaps}" target="_blank" class="btn-gmaps">🗺 Cómo llegar — Google Maps</a>`:
     `<p style="color:#aaa;font-size:12px;text-align:center;padding:10px">Sin coordenadas GPS</p>`}`;
@@ -753,6 +823,7 @@ function abrirMapaCompleto(){
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 cargarEstado();
+cargarTickets();
 renderLista(TODOS); renderMks(TODOS);
 document.getElementById('hdr-count').textContent=`${TODOS.length} cajeros`;
 document.getElementById('chip-count').textContent=TODOS.length;
