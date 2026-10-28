@@ -1,58 +1,19 @@
 {
-  "actualizado": "Miércoles 28/10/2026 09:33hs",
-  "total_tickets": 6,
-  "atms_con_tickets": 6,
+  "actualizado": "Miércoles 28/10/2026 10:42hs",
+  "total_tickets": 3,
+  "atms_con_tickets": 3,
   "tickets": {
-    "9636": [
-      {
-        "key": "SIT-56138",
-        "atm_id": 9636,
-        "resumen": "ATM 9636 - Diebold - Aguada San Roque - Mantenimiento preventivo",
-        "desc": "Diebold - Aguada San Roque - Mantenimiento preventivo",
-        "estado": "En progreso",
-        "tipo": "Reporte de errores y fallas - CAUT",
-        "prioridad": "Alta",
-        "creado": "28/10/2026 08:06",
-        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-56138"
-      }
-    ],
-    "9651": [
-      {
-        "key": "SIT-56098",
-        "atm_id": 9651,
-        "resumen": "ATM 9651 - Diebold - Chihuidos - se solicita un mantenimiento preventivo, cajero con mucho polvillo en general. ",
-        "desc": "Diebold - Chihuidos - se solicita un mantenimiento preventivo, cajero con mucho polvillo en general.",
-        "estado": "Pendiente proveedor",
-        "tipo": "Reporte de errores y fallas - CAUT",
-        "prioridad": "Alta",
-        "creado": "27/10/2026 13:01",
-        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-56098"
-      }
-    ],
     "9695": [
       {
         "key": "SIT-56055",
         "atm_id": 9695,
         "resumen": "ATM 9695 - Wincor - Canal V - Módulos 3 y 4. No realiza el test cash ni borra los contadores",
         "desc": "Wincor - Canal V - Módulos 3 y 4. No realiza el test cash ni borra los contadores",
-        "estado": "Pendiente proveedor",
+        "estado": "En progreso",
         "tipo": "Reporte de errores y fallas - CAUT",
         "prioridad": "Alta",
         "creado": "27/10/2026 08:44",
         "url": "https://servicedeskbpn.atlassian.net/browse/SIT-56055"
-      }
-    ],
-    "6388": [
-      {
-        "key": "SIT-55958",
-        "atm_id": 6388,
-        "resumen": "ATM 6388 - NCR - Barrios Zapala - Teclado EPP. Error de claves.",
-        "desc": "NCR - Barrios Zapala - Teclado EPP. Error de claves.",
-        "estado": "Pendiente proveedor",
-        "tipo": "Reporte de errores y fallas - CAUT",
-        "prioridad": "Alta",
-        "creado": "26/10/2026 08:45",
-        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-55958"
       }
     ],
     "9614": [
