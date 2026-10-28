@@ -1,8 +1,21 @@
 {
-  "actualizado": "Miércoles 28/10/2026 03:30hs",
-  "total_tickets": 5,
-  "atms_con_tickets": 5,
+  "actualizado": "Miércoles 28/10/2026 09:28hs",
+  "total_tickets": 6,
+  "atms_con_tickets": 6,
   "tickets": {
+    "9636": [
+      {
+        "key": "SIT-56138",
+        "atm_id": 9636,
+        "resumen": "ATM 9636 - Diebold - Aguada San Roque - Mantenimiento preventivo",
+        "desc": "Diebold - Aguada San Roque - Mantenimiento preventivo",
+        "estado": "En progreso",
+        "tipo": "Reporte de errores y fallas - CAUT",
+        "prioridad": "Alta",
+        "creado": "28/10/2026 08:06",
+        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-56138"
+      }
+    ],
     "9651": [
       {
         "key": "SIT-56098",
