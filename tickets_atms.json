@@ -1,8 +1,21 @@
 {
-  "actualizado": "Jueves 29/10/2026 07:38hs",
-  "total_tickets": 4,
-  "atms_con_tickets": 4,
+  "actualizado": "Jueves 29/10/2026 08:00hs",
+  "total_tickets": 5,
+  "atms_con_tickets": 5,
   "tickets": {
+    "9656": [
+      {
+        "key": "SIT-56207",
+        "atm_id": 9656,
+        "resumen": "ATM 9656 - Wincor - Petroeste - Dispensador de dinero. Falla 9.1",
+        "desc": "Wincor - Petroeste - Dispensador de dinero. Falla 9.1",
+        "estado": "En progreso",
+        "tipo": "Reporte de errores y fallas - CAUT",
+        "prioridad": "Alta",
+        "creado": "29/10/2026 07:39",
+        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-56207"
+      }
+    ],
     "21216": [
       {
         "key": "SIT-56177",
