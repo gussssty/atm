@@ -1,7 +1,7 @@
 {
-  "actualizado": "Viernes 30/10/2026 13:25hs",
-  "total_tickets": 8,
-  "atms_con_tickets": 7,
+  "actualizado": "Viernes 30/10/2026 18:17hs",
+  "total_tickets": 7,
+  "atms_con_tickets": 6,
   "tickets": {
     "21201": [
       {
@@ -20,24 +20,11 @@
         "atm_id": 21201,
         "resumen": "ATM 21201 - Wincor - Loncopué - Impresora de ticket. Queda off line.",
         "desc": "Wincor - Loncopué - Impresora de ticket. Queda off line.",
-        "estado": "En progreso",
+        "estado": "Pendiente proveedor",
         "tipo": "Reporte de errores y fallas - CAUT",
         "prioridad": "Alta",
         "creado": "29/10/2026 10:43",
         "url": "https://servicedeskbpn.atlassian.net/browse/SIT-56237"
-      }
-    ],
-    "9647": [
-      {
-        "key": "SIT-56274",
-        "atm_id": 9647,
-        "resumen": "ATM 9647 - DN - Aluminé - Tarjeta motorizada. Error de seguridad.",
-        "desc": "DN - Aluminé - Tarjeta motorizada. Error de seguridad.",
-        "estado": "Pendiente proveedor",
-        "tipo": "Reporte de errores y fallas - CAUT",
-        "prioridad": "Alta",
-        "creado": "29/10/2026 13:35",
-        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-56274"
       }
     ],
     "6385": [
@@ -46,7 +33,7 @@
         "atm_id": 6385,
         "resumen": "ATM 6385 - DN - Gregorio Álvarez - Lectora motorizada. Reiteradas fallas",
         "desc": "DN - Gregorio Álvarez - Lectora motorizada. Reiteradas fallas",
-        "estado": "Pendiente proveedor",
+        "estado": "En progreso",
         "tipo": "Reporte de errores y fallas - CAUT",
         "prioridad": "Media",
         "creado": "29/10/2026 09:15",
@@ -85,7 +72,7 @@
         "atm_id": 9695,
         "resumen": "ATM 9695 - Wincor - Canal V - Módulos 3 y 4. No realiza el test cash ni borra los contadores",
         "desc": "Wincor - Canal V - Módulos 3 y 4. No realiza el test cash ni borra los contadores",
-        "estado": "Pendiente proveedor",
+        "estado": "En espera del cliente",
         "tipo": "Reporte de errores y fallas - CAUT",
         "prioridad": "Alta",
         "creado": "27/10/2026 08:44",
