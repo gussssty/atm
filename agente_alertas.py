@@ -33,9 +33,34 @@ def cargar_json(path):
         print(f'  ✗ No se pudo leer {path}: {e}')
         return None
 
+def cargar_nombres_html(ruta='index.html'):
+    """Lee nombre y ciudad de cada ATM desde el HTML."""
+    nombres = {}
+    try:
+        import re
+        html = open(ruta, encoding='utf-8').read()
+        idx  = html.index('const D = ')
+        sub  = html[idx+10:]
+        depth = 0
+        for i, c in enumerate(sub):
+            if c == '{': depth += 1
+            elif c == '}': depth -= 1
+            if depth == 0: break
+        d = json.loads(sub[:i+1])
+        for a in d.get('atms', []):
+            nombres[str(a['id'])] = {
+                'nombre': a.get('nombre', ''),
+                'ciudad': a.get('ciudad', ''),
+            }
+        print(f'  ✓ Nombres cargados desde HTML: {len(nombres)} ATMs')
+    except Exception as e:
+        print(f'  ℹ No se pudo leer index.html: {e}')
+    return nombres
+
 def analizar():
-    sigma = cargar_json('estado_atms.json')
-    jira  = cargar_json('tickets_atms.json')
+    sigma  = cargar_json('estado_atms.json')
+    jira   = cargar_json('tickets_atms.json')
+    nombres = cargar_nombres_html()
 
     if not sigma:
         print('Sin estado_atms.json — no se puede analizar')
@@ -55,8 +80,8 @@ def analizar():
 
         atm_id  = int(atm_id_str)
         label   = est.get('label') or estado
-        nombre  = est.get('nombre', '')
-        ciudad  = est.get('ciudad', '')
+        nombre  = nombres.get(atm_id_str, {}).get('nombre', '') or est.get('nombre', '')
+        ciudad  = nombres.get(atm_id_str, {}).get('ciudad', '') or est.get('ciudad', '')
         desde   = est.get('fecha', '')[:16] if est.get('fecha') else ''
 
         ts = tickets_por_atm.get(atm_id_str, [])
@@ -146,9 +171,18 @@ def enviar(asunto, cuerpo):
     msg.attach(MIMEText(cuerpo, 'plain', 'utf-8'))
 
     print(f'  Enviando a: {", ".join(DESTINATARIOS)}')
-    with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
+    try:
+        # Intentar puerto 587 (TLS) primero — más compatible con redes corporativas
+        server = smtplib.SMTP('smtp.gmail.com', 587, timeout=20)
+        server.starttls()
         server.login(GMAIL_USER, GMAIL_PASS)
         server.sendmail(GMAIL_USER, DESTINATARIOS, msg.as_string())
+        server.quit()
+    except Exception:
+        # Fallback a puerto 465 (SSL)
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=20) as server:
+            server.login(GMAIL_USER, GMAIL_PASS)
+            server.sendmail(GMAIL_USER, DESTINATARIOS, msg.as_string())
     print('  ✓ Email enviado')
 
 # ── Main ──────────────────────────────────────────────────────────────────────
