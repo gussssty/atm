@@ -518,12 +518,14 @@ function filtrarEstado(tipo){
   const btnFds    = document.getElementById('btn-fds');
   const btnTicket = document.getElementById('btn-ticket');
 
-  // Click en el mismo botón activo → desactivar
+  // Click en el mismo botón activo → desactivar (mostrar todos)
   if(filtroEstadoActivo === tipo){
     filtroEstadoActivo = null;
     btnOk.classList.remove('activo','activo-ok');
     btnFds.classList.remove('activo','activo-fds');
     btnTicket.classList.remove('activo','activo-ticket');
+    filtrar();
+    return;
   } else {
     filtroEstadoActivo = tipo;
     // Limpiar todos primero
@@ -574,8 +576,11 @@ function filtrar(){
   });
   renderMks(filtrados); renderLista(filtrados);
   document.getElementById('chip-count').textContent=filtrados.length;
-  if(filtrados.length>0&&filtrados.length<TODOS.length)
+  if(filtrados.length>0&&filtrados.length<TODOS.length){
     mapa.fitBounds(L.latLngBounds(filtrados.filter(a=>a.lat).map(a=>[a.lat,a.lon])),{padding:[40,40]});
+  } else if(filtrados.length===TODOS.length){
+    mapa.setView([-38.95,-68.07],8);
+  }
 }
 document.getElementById('buscar').addEventListener('input',filtrar);
 function limpiar(){
