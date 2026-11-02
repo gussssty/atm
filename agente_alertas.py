@@ -149,6 +149,8 @@ def armar_cuerpo(sin_ticket, con_ticket, actualizado):
         '─' * 50,
         'ATM BPN — Alerta automática',
         'Este mensaje se genera automáticamente 2 veces por día.',
+        '',
+        'Más información: https://gussssty.github.io/atm/',
     ]
 
     return '\n'.join(lineas)
