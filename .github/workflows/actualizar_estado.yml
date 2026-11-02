@@ -62,7 +62,7 @@ jobs:
           fi
 
       - name: Enviar alerta email
-        if: github.event.schedule == '5 11 * * *' || github.event.schedule == '45 17 * * *' || github.event_name == 'workflow_dispatch'
+        if: github.event.schedule == '5 11 * * *' || github.event.schedule == '45 17 * * *'
         env:
           GMAIL_USER: ${{ secrets.GMAIL_USER }}
           GMAIL_PASS: ${{ secrets.GMAIL_PASS }}
