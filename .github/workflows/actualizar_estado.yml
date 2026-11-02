@@ -2,8 +2,10 @@ name: Actualizar Estado ATMs
 
 on:
   schedule:
-    - cron: '0 * * * *'   # cada hora
-  workflow_dispatch:        # también manual desde GitHub
+    - cron: '0 * * * *'      # cada hora — SIGMA + Jira
+    - cron: '5 11 * * *'     # 08:05 ARG (UTC-3 = 11:05 UTC) — alerta email
+    - cron: '45 17 * * *'    # 14:45 ARG (UTC-3 = 17:45 UTC) — alerta email
+  workflow_dispatch:          # también manual desde GitHub
 
 permissions:
   contents: write
@@ -21,54 +23,47 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Instalar dependencias SIGMA
+      - name: Instalar dependencias
         run: |
           pip install --break-system-packages \
             selenium webdriver-manager \
-            pandas xlrd openpyxl lxml html5lib
-
-      - name: Instalar dependencias Jira
-        run: |
-          pip install --break-system-packages requests
+            pandas xlrd openpyxl lxml html5lib \
+            requests
 
       - name: Ejecutar agente SIGMA
+        if: github.event.schedule == '0 * * * *' || github.event_name == 'workflow_dispatch'
         env:
           SIGMA_USER:     ${{ secrets.SIGMA_USER }}
           SIGMA_PASSWORD: ${{ secrets.SIGMA_PASSWORD }}
         run: python agente_sigma.py
-        continue-on-error: true   # si SIGMA falla, igual corre Jira
+        continue-on-error: true
 
       - name: Ejecutar agente Jira
+        if: github.event.schedule == '0 * * * *' || github.event_name == 'workflow_dispatch'
         env:
           JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
           JIRA_TOKEN: ${{ secrets.JIRA_TOKEN }}
         run: python agente_jira.py
-        continue-on-error: true   # si Jira falla, igual commitea SIGMA
-
-      - name: Subir debug de SIGMA (si falló)
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: sigma-debug
-          path: |
-            sigma_debug.html
-            sigma_monitor.html
-          if-no-files-found: ignore
+        continue-on-error: true
 
       - name: Commitear JSONs actualizados
+        if: github.event.schedule == '0 * * * *' || github.event_name == 'workflow_dispatch'
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          # Agregar solo los archivos que existan
           for f in estado_atms.json tickets_atms.json; do
             [ -f "$f" ] && git add "$f"
           done
-
-          # Solo commitear si hay cambios
           if git diff --staged --quiet; then
             echo "Sin cambios en los JSONs"
           else
             git commit -m "Auto: actualizar estado ATMs y tickets Jira [skip ci]"
             git push
           fi
+
+      - name: Enviar alerta email
+        if: github.event.schedule == '5 11 * * *' || github.event.schedule == '45 17 * * *'
+        env:
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_PASS: ${{ secrets.GMAIL_PASS }}
+        run: python agente_alertas.py
