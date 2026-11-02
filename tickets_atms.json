@@ -1,8 +1,21 @@
 {
-  "actualizado": "Lunes 02/11/2026 13:41hs",
+  "actualizado": "Lunes 02/11/2026 14:39hs",
   "total_tickets": 7,
   "atms_con_tickets": 7,
   "tickets": {
+    "5338": [
+      {
+        "key": "SIT-56494",
+        "atm_id": 5338,
+        "resumen": "ATM 5338 - Wincor - Jefatura de Policia - Falla modulo 4, traba desgastada, no funciona y expulsa las gavetas. ",
+        "desc": "Wincor - Jefatura de Policia - Falla modulo 4, traba desgastada, no funciona y expulsa las gavetas.",
+        "estado": "Pendiente proveedor",
+        "tipo": "Reporte de errores y fallas - CAUT",
+        "prioridad": "Alta",
+        "creado": "02/11/2026 14:30",
+        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-56494"
+      }
+    ],
     "5334": [
       {
         "key": "SIT-56470",
@@ -14,19 +27,6 @@
         "prioridad": "Alta",
         "creado": "02/11/2026 11:22",
         "url": "https://servicedeskbpn.atlassian.net/browse/SIT-56470"
-      }
-    ],
-    "21201": [
-      {
-        "key": "SIT-56237",
-        "atm_id": 21201,
-        "resumen": "ATM 21201 - Wincor - Loncopué - Impresora de ticket. Queda off line.",
-        "desc": "Wincor - Loncopué - Impresora de ticket. Queda off line.",
-        "estado": "Pendiente proveedor",
-        "tipo": "Reporte de errores y fallas - CAUT",
-        "prioridad": "Alta",
-        "creado": "29/10/2026 10:43",
-        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-56237"
       }
     ],
     "6385": [
