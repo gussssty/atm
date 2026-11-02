@@ -1,20 +1,22 @@
 {
-  "actualizado": "Lunes 02/11/2026 04:02hs",
+  "actualizado": "Lunes 02/11/2026 13:16hs",
   "total_tickets": 7,
-  "atms_con_tickets": 6,
+  "atms_con_tickets": 7,
   "tickets": {
-    "21201": [
+    "5334": [
       {
-        "key": "SIT-56321",
-        "atm_id": 21201,
-        "resumen": "ATM 21201 - Wincor - Loncopue - Falla dispenser, ruido fuera de los normal, motor sobecalentado, posible problema de engranajes.  ",
-        "desc": "Wincor - Loncopue - Falla dispenser, ruido fuera de los normal, motor sobecalentado, posible problema de engranajes.",
+        "key": "SIT-56470",
+        "atm_id": 5334,
+        "resumen": "ATM 5334 - NCR - B° Progreso Neuquén - Dispensador de dinero. CE Requerido.",
+        "desc": "NCR - B° Progreso Neuquén - Dispensador de dinero. CE Requerido.",
         "estado": "Pendiente proveedor",
         "tipo": "Reporte de errores y fallas - CAUT",
         "prioridad": "Alta",
-        "creado": "30/10/2026 09:12",
-        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-56321"
-      },
+        "creado": "02/11/2026 11:22",
+        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-56470"
+      }
+    ],
+    "21201": [
       {
         "key": "SIT-56237",
         "atm_id": 21201,
@@ -33,7 +35,7 @@
         "atm_id": 6385,
         "resumen": "ATM 6385 - DN - Gregorio Álvarez - Lectora motorizada. Reiteradas fallas",
         "desc": "DN - Gregorio Álvarez - Lectora motorizada. Reiteradas fallas",
-        "estado": "En progreso",
+        "estado": "En espera del cliente",
         "tipo": "Reporte de errores y fallas - CAUT",
         "prioridad": "Media",
         "creado": "29/10/2026 09:15",
