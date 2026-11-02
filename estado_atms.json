@@ -1,9 +1,9 @@
 {
-  "actualizado": "Lunes 02/11/2026 14:39hs",
+  "actualizado": "Lunes 02/11/2026 14:50hs",
   "total": 214,
   "resumen": {
-    "Operativo": 119,
-    "Advertencia": 42,
+    "Operativo": 118,
+    "Advertencia": 43,
     "Sin insumos": 31,
     "No dispensa": 6,
     "Falla depósito": 6,
@@ -874,6 +874,18 @@
       "conectiv": "TCP/IP",
       "carga": "CONTINUA CARGANDO"
     },
+    "9616": {
+      "estado": "ADVERTENCIA",
+      "label": "Advertencia",
+      "color": "#43A047",
+      "icono": "⚠",
+      "falla": "Lectora - Advertencia",
+      "falla_corta": "Advertencia",
+      "falla_cat": "Lectora",
+      "fecha": "02/11/2026 14:46",
+      "conectiv": "TCP/IP",
+      "carga": "INICIO DE CARGA"
+    },
     "9614": {
       "estado": "ADVERTENCIA",
       "label": "Advertencia",
@@ -1314,7 +1326,7 @@
       "falla": "nan",
       "falla_corta": "nan",
       "falla_cat": "",
-      "fecha": "02/11/2026 14:28",
+      "fecha": "02/11/2026 14:41",
       "conectiv": "TCP/IP",
       "carga": "INICIO DE CARGA"
     },
@@ -1494,7 +1506,7 @@
       "falla": "nan",
       "falla_corta": "nan",
       "falla_cat": "",
-      "fecha": "02/11/2026 14:30",
+      "fecha": "02/11/2026 14:46",
       "conectiv": "TCP/IP",
       "carga": "CARGA ABORTADA !!"
     },
@@ -1723,18 +1735,6 @@
       "falla_corta": "nan",
       "falla_cat": "",
       "fecha": "02/11/2026 12:43",
-      "conectiv": "TCP/IP",
-      "carga": "INICIO DE CARGA"
-    },
-    "9616": {
-      "estado": "OK",
-      "label": "Operativo",
-      "color": "#43A047",
-      "icono": "✓",
-      "falla": "nan",
-      "falla_corta": "nan",
-      "falla_cat": "",
-      "fecha": "02/11/2026 14:08",
       "conectiv": "TCP/IP",
       "carga": "INICIO DE CARGA"
     },
