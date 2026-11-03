@@ -1,15 +1,28 @@
 {
-  "actualizado": "Martes 03/11/2026 04:26hs",
+  "actualizado": "Martes 03/11/2026 08:55hs",
   "total_tickets": 7,
   "atms_con_tickets": 7,
   "tickets": {
+    "2507": [
+      {
+        "key": "SIT-56518",
+        "atm_id": 2507,
+        "resumen": "ATM 2507 - Wincor - San Patricio del Chañar - Lectora de tarjetas. User Error.",
+        "desc": "Wincor - San Patricio del Chañar - Lectora de tarjetas. User Error.",
+        "estado": "En progreso",
+        "tipo": "Reporte de errores y fallas - CAUT",
+        "prioridad": "Media",
+        "creado": "03/11/2026 08:12",
+        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-56518"
+      }
+    ],
     "5338": [
       {
         "key": "SIT-56494",
         "atm_id": 5338,
         "resumen": "ATM 5338 - Wincor - Jefatura de Policia - Falla modulo 4, traba desgastada, no funciona y expulsa las gavetas. ",
         "desc": "Wincor - Jefatura de Policia - Falla modulo 4, traba desgastada, no funciona y expulsa las gavetas.",
-        "estado": "Pendiente proveedor",
+        "estado": "En progreso",
         "tipo": "Reporte de errores y fallas - CAUT",
         "prioridad": "Alta",
         "creado": "02/11/2026 14:30",
@@ -66,19 +79,6 @@
         "prioridad": "Alta",
         "creado": "28/10/2026 11:30",
         "url": "https://servicedeskbpn.atlassian.net/browse/SIT-56177"
-      }
-    ],
-    "9695": [
-      {
-        "key": "SIT-56055",
-        "atm_id": 9695,
-        "resumen": "ATM 9695 - Wincor - Canal V - Módulos 3 y 4. No realiza el test cash ni borra los contadores",
-        "desc": "Wincor - Canal V - Módulos 3 y 4. No realiza el test cash ni borra los contadores",
-        "estado": "En espera del cliente",
-        "tipo": "Reporte de errores y fallas - CAUT",
-        "prioridad": "Alta",
-        "creado": "27/10/2026 08:44",
-        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-56055"
       }
     ],
     "2548": [
