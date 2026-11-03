@@ -1,0 +1,86 @@
+name: Actualizar Estado ATMs
+
+on:
+  schedule:
+    - cron: '0 * * * *'      # cada hora — SIGMA + Jira
+    - cron: '5 11 * * *'     # 08:05 ARG (UTC-3 = 11:05 UTC) — alerta email
+    - cron: '59 14 * * *'    # 11:59 ARG (UTC-3 = 14:59 UTC) — alerta email
+    - cron: '45 17 * * *'    # 14:45 ARG (UTC-3 = 17:45 UTC) — alerta email
+  workflow_dispatch:          # también manual desde GitHub
+
+permissions:
+  contents: write
+
+jobs:
+
+  # ── JOB 1: actualizar datos (corre cada hora) ────────────────────────────────
+  actualizar:
+    runs-on: ubuntu-latest
+    if: github.event.schedule == '0 * * * *' || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar dependencias
+        run: |
+          pip install --break-system-packages \
+            selenium webdriver-manager \
+            pandas xlrd openpyxl lxml html5lib \
+            requests
+
+      - name: Ejecutar agente SIGMA
+        env:
+          SIGMA_USER:     ${{ secrets.SIGMA_USER }}
+          SIGMA_PASSWORD: ${{ secrets.SIGMA_PASSWORD }}
+        run: python agente_sigma.py
+        continue-on-error: true
+
+      - name: Ejecutar agente Jira
+        env:
+          JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
+          JIRA_TOKEN: ${{ secrets.JIRA_TOKEN }}
+        run: python agente_jira.py
+        continue-on-error: true
+
+      - name: Commitear JSONs actualizados
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          for f in estado_atms.json tickets_atms.json; do
+            [ -f "$f" ] && git add "$f"
+          done
+          if git diff --staged --quiet; then
+            echo "Sin cambios en los JSONs"
+          else
+            git commit -m "Auto: actualizar estado ATMs y tickets Jira [skip ci]"
+            git push
+          fi
+
+  # ── JOB 2: alerta email (corre a las 8:05 y 14:45 ARG) ──────────────────────
+  alertas:
+    runs-on: ubuntu-latest
+    if: github.event.schedule == '5 11 * * *' || github.event.schedule == '59 14 * * *' || github.event.schedule == '45 17 * * *'
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar dependencias
+        run: pip install --break-system-packages requests
+
+      - name: Enviar alerta email
+        env:
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_PASS: ${{ secrets.GMAIL_PASS }}
+        run: python agente_alertas.py
