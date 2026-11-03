@@ -1,7 +1,7 @@
 {
-  "actualizado": "Martes 03/11/2026 12:41hs",
-  "total_tickets": 6,
-  "atms_con_tickets": 6,
+  "actualizado": "Martes 03/11/2026 14:15hs",
+  "total_tickets": 5,
+  "atms_con_tickets": 5,
   "tickets": {
     "2507": [
       {
@@ -14,19 +14,6 @@
         "prioridad": "Media",
         "creado": "03/11/2026 08:12",
         "url": "https://servicedeskbpn.atlassian.net/browse/SIT-56518"
-      }
-    ],
-    "5338": [
-      {
-        "key": "SIT-56494",
-        "atm_id": 5338,
-        "resumen": "ATM 5338 - Wincor - Jefatura de Policia - Falla modulo 4, traba desgastada, no funciona y expulsa las gavetas. ",
-        "desc": "Wincor - Jefatura de Policia - Falla modulo 4, traba desgastada, no funciona y expulsa las gavetas.",
-        "estado": "En progreso",
-        "tipo": "Reporte de errores y fallas - CAUT",
-        "prioridad": "Alta",
-        "creado": "02/11/2026 14:30",
-        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-56494"
       }
     ],
     "6385": [
@@ -61,7 +48,7 @@
         "atm_id": 21216,
         "resumen": "ATM 21216 - Wincor - Fatorello Zapala - Botón de SOP. No funciona correctamente para ingresar a Supervisor",
         "desc": "Wincor - Fatorello Zapala - Botón de SOP. No funciona correctamente para ingresar a Supervisor",
-        "estado": "En progreso",
+        "estado": "Pendiente proveedor",
         "tipo": "Reporte de errores y fallas - CAUT",
         "prioridad": "Alta",
         "creado": "28/10/2026 11:30",
