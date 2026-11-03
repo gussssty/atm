@@ -11,8 +11,11 @@ permissions:
   contents: write
 
 jobs:
+
+  # ── JOB 1: actualizar datos (corre cada hora) ────────────────────────────────
   actualizar:
     runs-on: ubuntu-latest
+    if: github.event.schedule == '0 * * * *' || github.event_name == 'workflow_dispatch'
 
     steps:
       - name: Checkout repo
@@ -31,7 +34,6 @@ jobs:
             requests
 
       - name: Ejecutar agente SIGMA
-        if: github.event.schedule == '0 * * * *' || github.event_name == 'workflow_dispatch'
         env:
           SIGMA_USER:     ${{ secrets.SIGMA_USER }}
           SIGMA_PASSWORD: ${{ secrets.SIGMA_PASSWORD }}
@@ -39,7 +41,6 @@ jobs:
         continue-on-error: true
 
       - name: Ejecutar agente Jira
-        if: github.event.schedule == '0 * * * *' || github.event_name == 'workflow_dispatch'
         env:
           JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
           JIRA_TOKEN: ${{ secrets.JIRA_TOKEN }}
@@ -47,7 +48,6 @@ jobs:
         continue-on-error: true
 
       - name: Commitear JSONs actualizados
-        if: github.event.schedule == '0 * * * *' || github.event_name == 'workflow_dispatch'
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -61,8 +61,24 @@ jobs:
             git push
           fi
 
+  # ── JOB 2: alerta email (corre a las 8:05 y 14:45 ARG) ──────────────────────
+  alertas:
+    runs-on: ubuntu-latest
+    if: github.event.schedule == '5 11 * * *' || github.event.schedule == '45 17 * * *'
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar dependencias
+        run: pip install --break-system-packages requests
+
       - name: Enviar alerta email
-        if: github.event.schedule == '5 11 * * *' || github.event.schedule == '45 17 * * *'
         env:
           GMAIL_USER: ${{ secrets.GMAIL_USER }}
           GMAIL_PASS: ${{ secrets.GMAIL_PASS }}
