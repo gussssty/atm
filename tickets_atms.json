@@ -1,7 +1,7 @@
 {
-  "actualizado": "Martes 03/11/2026 08:55hs",
-  "total_tickets": 7,
-  "atms_con_tickets": 7,
+  "actualizado": "Martes 03/11/2026 12:41hs",
+  "total_tickets": 6,
+  "atms_con_tickets": 6,
   "tickets": {
     "2507": [
       {
@@ -27,19 +27,6 @@
         "prioridad": "Alta",
         "creado": "02/11/2026 14:30",
         "url": "https://servicedeskbpn.atlassian.net/browse/SIT-56494"
-      }
-    ],
-    "5334": [
-      {
-        "key": "SIT-56470",
-        "atm_id": 5334,
-        "resumen": "ATM 5334 - NCR - B° Progreso Neuquén - Dispensador de dinero. CE Requerido.",
-        "desc": "NCR - B° Progreso Neuquén - Dispensador de dinero. CE Requerido.",
-        "estado": "Pendiente proveedor",
-        "tipo": "Reporte de errores y fallas - CAUT",
-        "prioridad": "Alta",
-        "creado": "02/11/2026 11:22",
-        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-56470"
       }
     ],
     "6385": [
