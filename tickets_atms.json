@@ -1,8 +1,21 @@
 {
-  "actualizado": "Martes 03/11/2026 14:15hs",
-  "total_tickets": 5,
-  "atms_con_tickets": 5,
+  "actualizado": "Martes 03/11/2026 18:24hs",
+  "total_tickets": 6,
+  "atms_con_tickets": 6,
   "tickets": {
+    "5338": [
+      {
+        "key": "SIT-56604",
+        "atm_id": 5338,
+        "resumen": "ATM 5338 - Wincor - Jefatura - falla dispenser, falla en modulo 3 y 4. ",
+        "desc": "Wincor - Jefatura - falla dispenser, falla en modulo 3 y 4.",
+        "estado": "Pendiente proveedor",
+        "tipo": "Reporte de errores y fallas - CAUT",
+        "prioridad": "Alta",
+        "creado": "03/11/2026 14:48",
+        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-56604"
+      }
+    ],
     "2507": [
       {
         "key": "SIT-56518",
