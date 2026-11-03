@@ -24,6 +24,9 @@ DIAS = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo']
 
 ESTADOS_PROBLEMA = {'FUERA DE SERVICIO', 'NO PAGA'}
 
+# ATMs excluidos del monitoreo de alertas (fuera de operación / dados de baja)
+ATMS_IGNORADOS = {6376, 6380, 6381, 6393, 9693, 21207, 21208, 21209, 21213, 21227}
+
 # ── Cargar datos ──────────────────────────────────────────────────────────────
 def cargar_json(path):
     try:
@@ -68,7 +71,10 @@ def analizar():
 
     tickets_por_atm = {}
     if jira:
-        tickets_por_atm = jira.get('tickets', {})
+        raw = jira.get('tickets', {})
+        # Normalizar keys a string para comparación consistente
+        tickets_por_atm = {str(k): v for k, v in raw.items()}
+        print(f'  ✓ Tickets Jira cargados: {len(tickets_por_atm)} cajeros con tickets')
 
     sin_ticket = []   # caídos sin ticket
     con_ticket = []   # caídos con ticket
@@ -76,6 +82,8 @@ def analizar():
     for atm_id_str, est in sigma.get('atms', {}).items():
         estado = (est.get('estado') or '').upper()
         if estado not in ESTADOS_PROBLEMA:
+            continue
+        if int(atm_id_str) in ATMS_IGNORADOS:
             continue
 
         atm_id  = int(atm_id_str)
