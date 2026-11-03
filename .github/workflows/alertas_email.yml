@@ -1,0 +1,30 @@
+name: Alertas Email ATMs
+
+on:
+  schedule:
+    - cron: '5 11 * * *'     # 08:05 ARG (UTC-3 = 11:05 UTC)
+    - cron: '59 14 * * *'    # 11:59 ARG (UTC-3 = 14:59 UTC)
+    - cron: '45 17 * * *'    # 14:45 ARG (UTC-3 = 17:45 UTC)
+  workflow_dispatch:
+
+jobs:
+  alertas:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar dependencias
+        run: pip install --break-system-packages requests
+
+      - name: Enviar alerta email
+        env:
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_PASS: ${{ secrets.GMAIL_PASS }}
+        run: python agente_alertas.py
