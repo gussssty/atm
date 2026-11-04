@@ -1,8 +1,21 @@
 {
-  "actualizado": "Miércoles 04/11/2026 13:43hs",
-  "total_tickets": 6,
-  "atms_con_tickets": 6,
+  "actualizado": "Miércoles 04/11/2026 15:07hs",
+  "total_tickets": 7,
+  "atms_con_tickets": 7,
   "tickets": {
+    "2549": [
+      {
+        "key": "SIT-56698",
+        "atm_id": 2549,
+        "resumen": "ATM 2549 - DN 200 - Casa Matriz - se solicita configurar 4 gavetas a 20.000",
+        "desc": "DN 200 - Casa Matriz - se solicita configurar 4 gavetas a 20.000",
+        "estado": "En progreso",
+        "tipo": "Reporte de errores y fallas - CAUT",
+        "prioridad": "Alta",
+        "creado": "04/11/2026 14:36",
+        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-56698"
+      }
+    ],
     "21230": [
       {
         "key": "SIT-56644",
@@ -22,7 +35,7 @@
         "atm_id": 5338,
         "resumen": "ATM 5338 - Wincor - Jefatura - falla dispenser, falla en modulo 3 y 4. ",
         "desc": "Wincor - Jefatura - falla dispenser, falla en modulo 3 y 4.",
-        "estado": "En progreso",
+        "estado": "Pendiente proveedor",
         "tipo": "Reporte de errores y fallas - CAUT",
         "prioridad": "Alta",
         "creado": "03/11/2026 14:48",
