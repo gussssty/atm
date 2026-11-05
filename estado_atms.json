@@ -1,13 +1,13 @@
 {
-  "actualizado": "Jueves 05/11/2026 07:33hs",
+  "actualizado": "Jueves 05/11/2026 07:34hs",
   "total": 214,
   "resumen": {
     "Operativo": 58,
     "Advertencia": 78,
-    "Sin insumos": 49,
+    "Sin insumos": 50,
     "No dispensa": 15,
     "Falla depósito": 4,
-    "Fuera de servicio": 10
+    "Fuera de servicio": 9
   },
   "atms": {
     "21227": {
@@ -117,18 +117,6 @@
       "fecha": "29/10/2026 13:15",
       "conectiv": "TCP/IP",
       "carga": "INICIO DE CARGA"
-    },
-    "2503": {
-      "estado": "FUERA DE SERVICIO",
-      "label": "Fuera de servicio",
-      "color": "#E53935",
-      "icono": "✗",
-      "falla": "Modo Supervisor - Activado",
-      "falla_corta": "Activado",
-      "falla_cat": "Modo Supervisor",
-      "fecha": "05/11/2026 07:32",
-      "conectiv": "TCP/IP",
-      "carga": "CONTINUA CARGANDO"
     },
     "21230": {
       "estado": "NO PAGA",
@@ -943,6 +931,18 @@
       "falla_corta": "Vacio",
       "falla_cat": "Hopper 1",
       "fecha": "04/11/2026 19:58",
+      "conectiv": "TCP/IP",
+      "carga": "CONTINUA CARGANDO"
+    },
+    "2503": {
+      "estado": "INSUMOS",
+      "label": "Sin insumos",
+      "color": "#43A047",
+      "icono": "📦",
+      "falla": "Hopper 1 - Vacio",
+      "falla_corta": "Vacio",
+      "falla_cat": "Hopper 1",
+      "fecha": "05/11/2026 07:33",
       "conectiv": "TCP/IP",
       "carga": "CONTINUA CARGANDO"
     },
