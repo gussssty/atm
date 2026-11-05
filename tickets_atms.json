@@ -1,71 +1,19 @@
 {
-  "actualizado": "Jueves 05/11/2026 07:34hs",
-  "total_tickets": 7,
-  "atms_con_tickets": 7,
+  "actualizado": "Jueves 05/11/2026 13:58hs",
+  "total_tickets": 3,
+  "atms_con_tickets": 3,
   "tickets": {
-    "2549": [
-      {
-        "key": "SIT-56698",
-        "atm_id": 2549,
-        "resumen": "ATM 2549 - DN 200 - Casa Matriz - se solicita configurar 4 gavetas a 20.000",
-        "desc": "DN 200 - Casa Matriz - se solicita configurar 4 gavetas a 20.000",
-        "estado": "En progreso",
-        "tipo": "Reporte de errores y fallas - CAUT",
-        "prioridad": "Alta",
-        "creado": "04/11/2026 14:36",
-        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-56698"
-      }
-    ],
     "21230": [
       {
         "key": "SIT-56644",
         "atm_id": 21230,
-        "resumen": "ATM 21230 - Wincor - Vega Maipú SMA - Operativo. No deja hacer ninguna operación.",
-        "desc": "Wincor - Vega Maipú SMA - Operativo. No deja hacer ninguna operación.",
+        "resumen": "ATM 21230 - Wincor - Vega Maipú SMA - Sistema Operativo. No deja hacer ninguna operación.",
+        "desc": "Wincor - Vega Maipú SMA - Sistema Operativo. No deja hacer ninguna operación.",
         "estado": "En progreso",
         "tipo": "Reporte de errores y fallas - CAUT",
         "prioridad": "Media",
         "creado": "04/11/2026 10:00",
         "url": "https://servicedeskbpn.atlassian.net/browse/SIT-56644"
-      }
-    ],
-    "5338": [
-      {
-        "key": "SIT-56604",
-        "atm_id": 5338,
-        "resumen": "ATM 5338 - Wincor - Jefatura - falla dispenser, falla en modulo 3 y 4. ",
-        "desc": "Wincor - Jefatura - falla dispenser, falla en modulo 3 y 4.",
-        "estado": "Pendiente proveedor",
-        "tipo": "Reporte de errores y fallas - CAUT",
-        "prioridad": "Alta",
-        "creado": "03/11/2026 14:48",
-        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-56604"
-      }
-    ],
-    "2507": [
-      {
-        "key": "SIT-56518",
-        "atm_id": 2507,
-        "resumen": "ATM 2507 - Wincor - San Patricio del Chañar - Lectora de tarjetas. User Error.",
-        "desc": "Wincor - San Patricio del Chañar - Lectora de tarjetas. User Error.",
-        "estado": "En progreso",
-        "tipo": "Reporte de errores y fallas - CAUT",
-        "prioridad": "Media",
-        "creado": "03/11/2026 08:12",
-        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-56518"
-      }
-    ],
-    "6385": [
-      {
-        "key": "SIT-56229",
-        "atm_id": 6385,
-        "resumen": "ATM 6385 - DN - Gregorio Álvarez - Lectora motorizada. Reiteradas fallas",
-        "desc": "DN - Gregorio Álvarez - Lectora motorizada. Reiteradas fallas",
-        "estado": "En progreso",
-        "tipo": "Reporte de errores y fallas - CAUT",
-        "prioridad": "Media",
-        "creado": "29/10/2026 09:15",
-        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-56229"
       }
     ],
     "21216": [
