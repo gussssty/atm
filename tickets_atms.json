@@ -1,21 +1,8 @@
 {
-  "actualizado": "Miércoles 11/11/2026 12:45hs",
-  "total_tickets": 7,
-  "atms_con_tickets": 6,
+  "actualizado": "Miércoles 11/11/2026 19:24hs",
+  "total_tickets": 6,
+  "atms_con_tickets": 5,
   "tickets": {
-    "9608": [
-      {
-        "key": "SIT-56832",
-        "atm_id": 9608,
-        "resumen": "ATM 9608 - Wincor - Plaza Huincul  - Dispensador -  (Código Error 2 - 3).",
-        "desc": "Wincor - Plaza Huincul  - Dispensador -  (Código Error 2 - 3).",
-        "estado": "En progreso",
-        "tipo": "Reporte de errores y fallas - CAUT",
-        "prioridad": "Alta",
-        "creado": "11/11/2026 09:47",
-        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-56832"
-      }
-    ],
     "9614": [
       {
         "key": "SIT-56804",
