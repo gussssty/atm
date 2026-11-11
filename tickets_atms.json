@@ -1,19 +1,56 @@
 {
-  "actualizado": "Miércoles 11/11/2026 08:35hs",
-  "total_tickets": 4,
-  "atms_con_tickets": 4,
+  "actualizado": "Miércoles 11/11/2026 12:45hs",
+  "total_tickets": 7,
+  "atms_con_tickets": 6,
   "tickets": {
+    "9608": [
+      {
+        "key": "SIT-56832",
+        "atm_id": 9608,
+        "resumen": "ATM 9608 - Wincor - Plaza Huincul  - Dispensador -  (Código Error 2 - 3).",
+        "desc": "Wincor - Plaza Huincul  - Dispensador -  (Código Error 2 - 3).",
+        "estado": "En progreso",
+        "tipo": "Reporte de errores y fallas - CAUT",
+        "prioridad": "Alta",
+        "creado": "11/11/2026 09:47",
+        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-56832"
+      }
+    ],
     "9614": [
       {
         "key": "SIT-56804",
         "atm_id": 9614,
-        "resumen": "ATM 9614  DN - Chos Malal -  Lectora de Tarjetas - Capura ",
-        "desc": "DN - Chos Malal -  Lectora de Tarjetas - Capura",
-        "estado": "En progreso",
+        "resumen": "ATM 9614 - DN - Chos Malal -  Lectora de tarjetas motorizada. Sigue reiterando fallas",
+        "desc": "DN - Chos Malal -  Lectora de tarjetas motorizada. Sigue reiterando fallas",
+        "estado": "Pendiente proveedor",
         "tipo": "Reporte de errores y fallas - CAUT",
         "prioridad": "Alta",
         "creado": "11/11/2026 07:51",
         "url": "https://servicedeskbpn.atlassian.net/browse/SIT-56804"
+      }
+    ],
+    "9683": [
+      {
+        "key": "SIT-56802",
+        "atm_id": 9683,
+        "resumen": "ATM 9683 - Wincor - Terminal Chos Malal - Dispensador de dinero. Deja billetes en el clamp.",
+        "desc": "Wincor - Terminal Chos Malal - Dispensador de dinero. Deja billetes en el clamp.",
+        "estado": "Pendiente proveedor",
+        "tipo": "Reporte de errores y fallas - CAUT",
+        "prioridad": "Media",
+        "creado": "11/11/2026 07:49",
+        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-56802"
+      },
+      {
+        "key": "SIT-56798",
+        "atm_id": 9683,
+        "resumen": "ATM 9683 - Wincor - Teminal Chos Malal - Impresora de ticket. Falla mecánica.",
+        "desc": "Wincor - Teminal Chos Malal - Impresora de ticket. Falla mecánica.",
+        "estado": "Pendiente proveedor",
+        "tipo": "Reporte de errores y fallas - CAUT",
+        "prioridad": "Alta",
+        "creado": "11/11/2026 07:45",
+        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-56798"
       }
     ],
     "21230": [
@@ -22,7 +59,7 @@
         "atm_id": 21230,
         "resumen": "ATM 21230 - Wincor - Vega Maipú SMA - Sistema Operativo. No deja hacer ninguna operación.",
         "desc": "Wincor - Vega Maipú SMA - Sistema Operativo. No deja hacer ninguna operación.",
-        "estado": "En progreso",
+        "estado": "Pendiente proveedor",
         "tipo": "Reporte de errores y fallas - CAUT",
         "prioridad": "Media",
         "creado": "04/11/2026 10:00",
