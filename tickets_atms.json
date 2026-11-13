@@ -1,8 +1,21 @@
 {
-  "actualizado": "Viernes 13/11/2026 07:30hs",
-  "total_tickets": 3,
-  "atms_con_tickets": 3,
+  "actualizado": "Viernes 13/11/2026 09:53hs",
+  "total_tickets": 4,
+  "atms_con_tickets": 4,
   "tickets": {
+    "9632": [
+      {
+        "key": "SIT-57066",
+        "atm_id": 9632,
+        "resumen": "ATM 9632 - DN - Villa Pehuenia - Sistema Operativo. No inicia.",
+        "desc": "DN - Villa Pehuenia - Sistema Operativo. No inicia.",
+        "estado": "Pendiente proveedor",
+        "tipo": "Reporte de errores y fallas - CAUT",
+        "prioridad": "Alta",
+        "creado": "13/11/2026 09:29",
+        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-57066"
+      }
+    ],
     "21230": [
       {
         "key": "SIT-56644",
