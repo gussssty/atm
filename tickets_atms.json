@@ -1,19 +1,58 @@
 {
-  "actualizado": "Lunes 16/11/2026 04:31hs",
-  "total_tickets": 4,
-  "atms_con_tickets": 4,
+  "actualizado": "Lunes 16/11/2026 14:45hs",
+  "total_tickets": 7,
+  "atms_con_tickets": 7,
   "tickets": {
-    "9632": [
+    "6361": [
       {
-        "key": "SIT-57066",
-        "atm_id": 9632,
-        "resumen": "ATM 9632 - DN - Villa Pehuenia - Sistema Operativo. No inicia.",
-        "desc": "DN - Villa Pehuenia - Sistema Operativo. No inicia.",
+        "key": "SIT-57209",
+        "atm_id": 6361,
+        "resumen": "ATM 6361 - DN - Centenario - Sistema Operativo - falla inicio ",
+        "desc": "DN - Centenario - Sistema Operativo - falla inicio",
         "estado": "Pendiente proveedor",
         "tipo": "Reporte de errores y fallas - CAUT",
         "prioridad": "Alta",
-        "creado": "13/11/2026 09:29",
-        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-57066"
+        "creado": "16/11/2026 10:56",
+        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-57209"
+      }
+    ],
+    "2543": [
+      {
+        "key": "SIT-57170",
+        "atm_id": 2543,
+        "resumen": "ATM 2543 - Wincor - Centenario - Lectora motorizada. Queda en modo suspendida",
+        "desc": "Wincor - Centenario - Lectora motorizada. Queda en modo suspendida",
+        "estado": "En progreso",
+        "tipo": "Reporte de errores y fallas - CAUT",
+        "prioridad": "Alta",
+        "creado": "16/11/2026 08:52",
+        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-57170"
+      }
+    ],
+    "9696": [
+      {
+        "key": "SIT-57152",
+        "atm_id": 9696,
+        "resumen": "ATM 9696 - Wincor - Zapala - Falla dispenser",
+        "desc": "Wincor - Zapala - Falla dispenser",
+        "estado": "Pendiente proveedor",
+        "tipo": "Reporte de errores y fallas - CAUT",
+        "prioridad": "Media",
+        "creado": "16/11/2026 07:41",
+        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-57152"
+      }
+    ],
+    "9669": [
+      {
+        "key": "SIT-57139",
+        "atm_id": 9669,
+        "resumen": "ATM 9669 - Wincor - Villa Farrell - Vandalismo - Monitro cliente",
+        "desc": "Wincor - Villa Farrell - Vandalismo - Monitro cliente",
+        "estado": "Pendiente proveedor",
+        "tipo": "Reporte de errores y fallas - CAUT",
+        "prioridad": "Alta",
+        "creado": "13/11/2026 15:50",
+        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-57139"
       }
     ],
     "21230": [
