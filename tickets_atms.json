@@ -1,7 +1,7 @@
 {
-  "actualizado": "Martes 17/11/2026 06:58hs",
-  "total_tickets": 6,
-  "atms_con_tickets": 6,
+  "actualizado": "Martes 17/11/2026 11:30hs",
+  "total_tickets": 4,
+  "atms_con_tickets": 4,
   "tickets": {
     "21207": [
       {
@@ -20,39 +20,13 @@
       {
         "key": "SIT-57152",
         "atm_id": 9696,
-        "resumen": "ATM 9696 - Wincor - Zapala - Falla dispenser",
-        "desc": "Wincor - Zapala - Falla dispenser",
+        "resumen": "ATM 9696 - Wincor - B° Don Bosco Zapala - Falla dispenser, error 2.8 Shutter. ",
+        "desc": "Wincor - B° Don Bosco Zapala - Falla dispenser, error 2.8 Shutter.",
         "estado": "Pendiente proveedor",
         "tipo": "Reporte de errores y fallas - CAUT",
         "prioridad": "Media",
         "creado": "16/11/2026 07:41",
         "url": "https://servicedeskbpn.atlassian.net/browse/SIT-57152"
-      }
-    ],
-    "9669": [
-      {
-        "key": "SIT-57139",
-        "atm_id": 9669,
-        "resumen": "ATM 9669 - Wincor - Villa Farrell - Vandalismo - Monitro cliente",
-        "desc": "Wincor - Villa Farrell - Vandalismo - Monitro cliente",
-        "estado": "Pendiente proveedor",
-        "tipo": "Reporte de errores y fallas - CAUT",
-        "prioridad": "Alta",
-        "creado": "13/11/2026 15:50",
-        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-57139"
-      }
-    ],
-    "21230": [
-      {
-        "key": "SIT-56644",
-        "atm_id": 21230,
-        "resumen": "ATM 21230 - Wincor - Vega Maipú SMA - Sistema Operativo. No deja hacer ninguna operación.",
-        "desc": "Wincor - Vega Maipú SMA - Sistema Operativo. No deja hacer ninguna operación.",
-        "estado": "Pendiente proveedor",
-        "tipo": "Reporte de errores y fallas - CAUT",
-        "prioridad": "Media",
-        "creado": "04/11/2026 10:00",
-        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-56644"
       }
     ],
     "21216": [
