@@ -1,32 +1,19 @@
 {
-  "actualizado": "Lunes 16/11/2026 14:45hs",
-  "total_tickets": 7,
-  "atms_con_tickets": 7,
+  "actualizado": "Lunes 16/11/2026 22:24hs",
+  "total_tickets": 6,
+  "atms_con_tickets": 6,
   "tickets": {
-    "6361": [
+    "21207": [
       {
-        "key": "SIT-57209",
-        "atm_id": 6361,
-        "resumen": "ATM 6361 - DN - Centenario - Sistema Operativo - falla inicio ",
-        "desc": "DN - Centenario - Sistema Operativo - falla inicio",
+        "key": "SIT-57254",
+        "atm_id": 21207,
+        "resumen": "ATM 21207 - Wincor - BAM 4 - Sin comunicación. No conecta con Link",
+        "desc": "Wincor - BAM 4 - Sin comunicación. No conecta con Link",
         "estado": "Pendiente proveedor",
         "tipo": "Reporte de errores y fallas - CAUT",
         "prioridad": "Alta",
-        "creado": "16/11/2026 10:56",
-        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-57209"
-      }
-    ],
-    "2543": [
-      {
-        "key": "SIT-57170",
-        "atm_id": 2543,
-        "resumen": "ATM 2543 - Wincor - Centenario - Lectora motorizada. Queda en modo suspendida",
-        "desc": "Wincor - Centenario - Lectora motorizada. Queda en modo suspendida",
-        "estado": "En progreso",
-        "tipo": "Reporte de errores y fallas - CAUT",
-        "prioridad": "Alta",
-        "creado": "16/11/2026 08:52",
-        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-57170"
+        "creado": "16/11/2026 14:28",
+        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-57254"
       }
     ],
     "9696": [
