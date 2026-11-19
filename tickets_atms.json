@@ -1,8 +1,21 @@
 {
-  "actualizado": "Jueves 19/11/2026 05:16hs",
-  "total_tickets": 7,
-  "atms_con_tickets": 7,
+  "actualizado": "Jueves 19/11/2026 14:53hs",
+  "total_tickets": 6,
+  "atms_con_tickets": 6,
   "tickets": {
+    "9683": [
+      {
+        "key": "SIT-57512",
+        "atm_id": 9683,
+        "resumen": "ATM 9683 - Wincor - Chos Malal - Falla lectora, esta capturando tarjetas el cajero. ",
+        "desc": "Wincor - Chos Malal - Falla lectora, esta capturando tarjetas el cajero.",
+        "estado": "Pendiente proveedor",
+        "tipo": "Reporte de errores y fallas - CAUT",
+        "prioridad": "Alta",
+        "creado": "19/11/2026 10:15",
+        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-57512"
+      }
+    ],
     "21221": [
       {
         "key": "SIT-57402",
@@ -20,26 +33,13 @@
       {
         "key": "SIT-57379",
         "atm_id": 9633,
-        "resumen": "ATM 9633 - Diebold - El Sauce - Impresora - Técnico",
-        "desc": "Diebold - El Sauce - Impresora - Técnico",
+        "resumen": "ATM 9633 - Diebold - El Sauce - Impresora de ticket. Error de comunicación.",
+        "desc": "Diebold - El Sauce - Impresora de ticket. Error de comunicación.",
         "estado": "En progreso",
         "tipo": "Reporte de errores y fallas - CAUT",
         "prioridad": "Alta",
         "creado": "18/11/2026 08:18",
         "url": "https://servicedeskbpn.atlassian.net/browse/SIT-57379"
-      }
-    ],
-    "9616": [
-      {
-        "key": "SIT-57378",
-        "atm_id": 9616,
-        "resumen": "ATM 9616 - Wincor - Poder judicial - falla dispenser, error 1.8, deja dinero en el clamp.",
-        "desc": "Wincor - Poder judicial - falla dispenser, error 1.8, deja dinero en el clamp.",
-        "estado": "Pendiente proveedor",
-        "tipo": "Reporte de errores y fallas - CAUT",
-        "prioridad": "Alta",
-        "creado": "18/11/2026 08:15",
-        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-57378"
       }
     ],
     "21207": [
@@ -53,19 +53,6 @@
         "prioridad": "Alta",
         "creado": "16/11/2026 14:28",
         "url": "https://servicedeskbpn.atlassian.net/browse/SIT-57254"
-      }
-    ],
-    "9696": [
-      {
-        "key": "SIT-57152",
-        "atm_id": 9696,
-        "resumen": "ATM 9696 - Wincor - B° Don Bosco Zapala - Falla dispenser, error 2.8 Shutter. ",
-        "desc": "Wincor - B° Don Bosco Zapala - Falla dispenser, error 2.8 Shutter.",
-        "estado": "En progreso",
-        "tipo": "Reporte de errores y fallas - CAUT",
-        "prioridad": "Media",
-        "creado": "16/11/2026 07:41",
-        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-57152"
       }
     ],
     "21216": [
