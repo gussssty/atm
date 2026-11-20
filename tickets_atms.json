@@ -1,8 +1,21 @@
 {
-  "actualizado": "Viernes 20/11/2026 04:58hs",
+  "actualizado": "Viernes 20/11/2026 13:43hs",
   "total_tickets": 6,
   "atms_con_tickets": 6,
   "tickets": {
+    "21201": [
+      {
+        "key": "SIT-57643",
+        "atm_id": 21201,
+        "resumen": "ATM 21201 - Wincor - Loncopue - Falla dispenser, ruido fuera de los normal en el dispensador ",
+        "desc": "Wincor - Loncopue - Falla dispenser, ruido fuera de los normal en el dispensador",
+        "estado": "Pendiente proveedor",
+        "tipo": "Reporte de errores y fallas - CAUT",
+        "prioridad": "Alta",
+        "creado": "20/11/2026 12:15",
+        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-57643"
+      }
+    ],
     "9683": [
       {
         "key": "SIT-57512",
@@ -14,19 +27,6 @@
         "prioridad": "Alta",
         "creado": "19/11/2026 10:15",
         "url": "https://servicedeskbpn.atlassian.net/browse/SIT-57512"
-      }
-    ],
-    "21221": [
-      {
-        "key": "SIT-57402",
-        "atm_id": 21221,
-        "resumen": "ATM 21221 - Diarco Cutral co - DN 100 - Falla sistema operativo, pantalla en color azul, no inicia el cajero en forma normal. ",
-        "desc": "Diarco Cutral co - DN 100 - Falla sistema operativo, pantalla en color azul, no inicia el cajero en forma normal.",
-        "estado": "Pendiente proveedor",
-        "tipo": "Reporte de errores y fallas - CAUT",
-        "prioridad": "Alta",
-        "creado": "18/11/2026 10:08",
-        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-57402"
       }
     ],
     "9633": [
