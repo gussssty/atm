@@ -1,5 +1,5 @@
 {
-  "actualizado": "Viernes 20/11/2026 13:43hs",
+  "actualizado": "Viernes 20/11/2026 19:54hs",
   "total_tickets": 6,
   "atms_con_tickets": 6,
   "tickets": {
@@ -7,13 +7,26 @@
       {
         "key": "SIT-57643",
         "atm_id": 21201,
-        "resumen": "ATM 21201 - Wincor - Loncopue - Falla dispenser, ruido fuera de los normal en el dispensador ",
-        "desc": "Wincor - Loncopue - Falla dispenser, ruido fuera de los normal en el dispensador",
+        "resumen": "ATM 21201 - Wincor - Loncopue - ruido fuera de los normal en el dispensador, no presenta fallas el cajero. ",
+        "desc": "Wincor - Loncopue - ruido fuera de los normal en el dispensador, no presenta fallas el cajero.",
         "estado": "Pendiente proveedor",
         "tipo": "Reporte de errores y fallas - CAUT",
         "prioridad": "Alta",
         "creado": "20/11/2026 12:15",
         "url": "https://servicedeskbpn.atlassian.net/browse/SIT-57643"
+      }
+    ],
+    "9696": [
+      {
+        "key": "SIT-57629",
+        "atm_id": 9696,
+        "resumen": "ATM 9696 - Wincor - Don Bosco Zapala - Dispensador de dinero. Sigue fallando el dispensador (código 1.9)",
+        "desc": "Wincor - Don Bosco Zapala - Dispensador de dinero. Sigue fallando el dispensador (código 1.9)",
+        "estado": "Pendiente proveedor",
+        "tipo": "Reporte de errores y fallas - CAUT",
+        "prioridad": "Alta",
+        "creado": "20/11/2026 11:18",
+        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-57629"
       }
     ],
     "9683": [
@@ -35,24 +48,11 @@
         "atm_id": 9633,
         "resumen": "ATM 9633 - Diebold - El Sauce - Impresora de ticket. Error de comunicación.",
         "desc": "Diebold - El Sauce - Impresora de ticket. Error de comunicación.",
-        "estado": "En progreso",
+        "estado": "Pendiente proveedor",
         "tipo": "Reporte de errores y fallas - CAUT",
         "prioridad": "Alta",
         "creado": "18/11/2026 08:18",
         "url": "https://servicedeskbpn.atlassian.net/browse/SIT-57379"
-      }
-    ],
-    "21207": [
-      {
-        "key": "SIT-57254",
-        "atm_id": 21207,
-        "resumen": "ATM 21207 - Wincor - BAM 4 - Sin comunicación. No conecta con Link",
-        "desc": "Wincor - BAM 4 - Sin comunicación. No conecta con Link",
-        "estado": "Pendiente proveedor",
-        "tipo": "Reporte de errores y fallas - CAUT",
-        "prioridad": "Alta",
-        "creado": "16/11/2026 14:28",
-        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-57254"
       }
     ],
     "21216": [
