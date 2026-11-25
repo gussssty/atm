@@ -1,8 +1,34 @@
 {
-  "actualizado": "Miércoles 25/11/2026 08:57hs",
-  "total_tickets": 7,
-  "atms_con_tickets": 7,
+  "actualizado": "Miércoles 25/11/2026 18:06hs",
+  "total_tickets": 6,
+  "atms_con_tickets": 6,
   "tickets": {
+    "9644": [
+      {
+        "key": "SIT-57865",
+        "atm_id": 9644,
+        "resumen": "ATM 9644 - Wincor - La Anonima -falla dispenser, error 2.8, sgutter, no se puede borrar el error. ",
+        "desc": "Wincor - La Anonima -falla dispenser, error 2.8, sgutter, no se puede borrar el error.",
+        "estado": "En progreso",
+        "tipo": "Reporte de errores y fallas - CAUT",
+        "prioridad": "Alta",
+        "creado": "25/11/2026 11:40",
+        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-57865"
+      }
+    ],
+    "6355": [
+      {
+        "key": "SIT-57807",
+        "atm_id": 6355,
+        "resumen": "ATM 6355 - Diebold - Huinganco - Dispensador de dinero. Se rompió la ficha USB",
+        "desc": "Diebold - Huinganco - Dispensador de dinero. Se rompió la ficha USB",
+        "estado": "Pendiente proveedor",
+        "tipo": "Reporte de errores y fallas - CAUT",
+        "prioridad": "Alta",
+        "creado": "25/11/2026 08:34",
+        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-57807"
+      }
+    ],
     "6369": [
       {
         "key": "SIT-57766",
@@ -14,32 +40,6 @@
         "prioridad": "Alta",
         "creado": "24/11/2026 13:11",
         "url": "https://servicedeskbpn.atlassian.net/browse/SIT-57766"
-      }
-    ],
-    "9616": [
-      {
-        "key": "SIT-57698",
-        "atm_id": 9616,
-        "resumen": "ATM 9616 - Wincor - Poder Judicial - falla dispensador, error 1.9, clamp desincronizado. ",
-        "desc": "Wincor - Poder Judicial - falla dispensador, error 1.9, clamp desincronizado.",
-        "estado": "En espera del cliente",
-        "tipo": "Reporte de errores y fallas - CAUT",
-        "prioridad": "Alta",
-        "creado": "24/11/2026 08:38",
-        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-57698"
-      }
-    ],
-    "21201": [
-      {
-        "key": "SIT-57643",
-        "atm_id": 21201,
-        "resumen": "ATM 21201 - Wincor - Loncopue - ruido fuera de los normal en el dispensador, no presenta fallas el cajero. ",
-        "desc": "Wincor - Loncopue - ruido fuera de los normal en el dispensador, no presenta fallas el cajero.",
-        "estado": "Pendiente proveedor",
-        "tipo": "Reporte de errores y fallas - CAUT",
-        "prioridad": "Alta",
-        "creado": "20/11/2026 12:15",
-        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-57643"
       }
     ],
     "9683": [
@@ -66,19 +66,6 @@
         "prioridad": "Alta",
         "creado": "18/11/2026 08:18",
         "url": "https://servicedeskbpn.atlassian.net/browse/SIT-57379"
-      }
-    ],
-    "21216": [
-      {
-        "key": "SIT-56177",
-        "atm_id": 21216,
-        "resumen": "ATM 21216 - Wincor - Fatorello Zapala - Botón de SOP. No funciona correctamente para ingresar a Supervisor",
-        "desc": "Wincor - Fatorello Zapala - Botón de SOP. No funciona correctamente para ingresar a Supervisor",
-        "estado": "Pendiente proveedor",
-        "tipo": "Reporte de errores y fallas - CAUT",
-        "prioridad": "Alta",
-        "creado": "28/10/2026 11:30",
-        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-56177"
       }
     ],
     "2548": [
