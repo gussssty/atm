@@ -1,7 +1,7 @@
 {
-  "actualizado": "Viernes 27/11/2026 01:42hs",
-  "total_tickets": 2,
-  "atms_con_tickets": 2,
+  "actualizado": "Viernes 27/11/2026 09:04hs",
+  "total_tickets": 1,
+  "atms_con_tickets": 1,
   "tickets": {
     "9670": [
       {
@@ -9,24 +9,11 @@
         "atm_id": 9670,
         "resumen": "ATM 9670 - Wincor - Barrio La Sirena - Falla dispenser, error shutter",
         "desc": "Wincor - Barrio La Sirena - Falla dispenser, error shutter",
-        "estado": "En espera del cliente",
+        "estado": "En progreso",
         "tipo": "Reporte de errores y fallas - CAUT",
         "prioridad": "Alta",
         "creado": "26/11/2026 08:23",
         "url": "https://servicedeskbpn.atlassian.net/browse/SIT-57911"
-      }
-    ],
-    "6355": [
-      {
-        "key": "SIT-57807",
-        "atm_id": 6355,
-        "resumen": "ATM 6355 - Diebold - Huinganco - Dispensador de dinero. Se rompió la ficha USB",
-        "desc": "Diebold - Huinganco - Dispensador de dinero. Se rompió la ficha USB",
-        "estado": "Pendiente proveedor",
-        "tipo": "Reporte de errores y fallas - CAUT",
-        "prioridad": "Alta",
-        "creado": "25/11/2026 08:34",
-        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-57807"
       }
     ]
   }
