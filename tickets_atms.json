@@ -1,8 +1,21 @@
 {
-  "actualizado": "Viernes 27/11/2026 09:04hs",
-  "total_tickets": 1,
-  "atms_con_tickets": 1,
+  "actualizado": "Viernes 27/11/2026 11:34hs",
+  "total_tickets": 2,
+  "atms_con_tickets": 2,
   "tickets": {
+    "9655": [
+      {
+        "key": "SIT-58016",
+        "atm_id": 9655,
+        "resumen": "ATM 9655 - Wincor - Villa la Angostura - hardware - no inicia",
+        "desc": "Wincor - Villa la Angostura - hardware - no inicia",
+        "estado": "Pendiente proveedor",
+        "tipo": "Reporte de errores y fallas - CAUT",
+        "prioridad": "Alta",
+        "creado": "27/11/2026 09:08",
+        "url": "https://servicedeskbpn.atlassian.net/browse/SIT-58016"
+      }
+    ],
     "9670": [
       {
         "key": "SIT-57911",
